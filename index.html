@@ -14,18 +14,17 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=intro-3" />
   </head>
   <body class="is-introing">
     <div class="noise" aria-hidden="true"></div>
 
     <div class="intro" id="intro" aria-hidden="true">
-      <div class="intro-grid"></div>
       <div class="intro-veil intro-veil-top"></div>
       <div class="intro-veil intro-veil-bottom"></div>
-      <span class="intro-rule"></span>
       <div class="intro-lockup">
         <span class="intro-mark">PJ</span>
+        <span class="intro-rule"></span>
         <span class="intro-copy">
           <span class="intro-name">Piotr Jandura</span>
           <span class="intro-sub">Computer Systems Engineering</span>
@@ -64,10 +63,19 @@
     <main id="top">
       <section class="hero">
         <p class="eyebrow">Barrett Honors · Ira A. Fulton Schools of Engineering</p>
-        <h1>
-          Piotr Jandura
-          <span>builds systems that hold up in the real world.</span>
-        </h1>
+        <div class="hero-identity">
+          <img
+            class="hero-photo"
+            src="images/piotr.jpg"
+            alt="Piotr Jandura"
+            width="400"
+            height="400"
+          />
+          <h1>
+            Piotr Jandura
+            <span>builds systems that hold up in the real world.</span>
+          </h1>
+        </div>
         <p class="lede">
           Computer Systems Engineering student at Arizona State University,
           focused on cybersecurity — software, hardware, and work that has to
@@ -201,6 +209,10 @@
             <p class="card-note">
               Empathy, cultural understanding, and teamwork are not extras.
               They’re how the engineering actually works.
+            </p>
+            <p>
+              <a href="https://epics.piotrjandura.com">epics.piotrjandura.com</a>
+              — dashboard coming soon.
             </p>
           </article>
           <article class="card">
@@ -372,6 +384,6 @@
       <p>Tempe, Arizona</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=intro-3"></script>
   </body>
 </html>

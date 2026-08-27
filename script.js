@@ -47,18 +47,6 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (reduced) {
   finishIntro();
 } else {
-  const rule = document.querySelector(".intro-rule");
-  const pinRule = () => {
-    if (!rule || document.body.classList.contains("intro-done")) return;
-    const view = window.visualViewport;
-    const x = view ? view.width / 2 + view.offsetLeft : window.innerWidth / 2;
-    const y = view ? view.height / 2 + view.offsetTop : window.innerHeight / 2;
-    rule.style.left = `${x}px`;
-    rule.style.top = `${y}px`;
-  };
-  pinRule();
-  window.addEventListener("resize", pinRule);
-  window.visualViewport?.addEventListener("resize", pinRule);
   requestAnimationFrame(() => document.body.classList.add("intro-play"));
-  window.setTimeout(finishIntro, 2800);
+  window.setTimeout(finishIntro, 4200);
 }
