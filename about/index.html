@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About — Piotr Jandura</title>
+    <meta
+      name="description"
+      content="About Piotr Jandura, an honors Computer Systems Engineering student at Arizona State University."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="mark" href="/">PJ</a>
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        aria-label="Open menu"
+      >
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links" id="primary-nav" aria-label="Primary">
+        <a href="/about/">About</a>
+        <a href="/experience/">Experience</a>
+        <a href="/work/">Work</a>
+        <a href="/skills/">Skills</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="nav-cta nav-cta-epics" href="https://epics.piotrjandura.com">EPICS</a>
+        <a
+          class="nav-cta"
+          href="https://www.linkedin.com/in/piotrjandura"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn</a
+        >
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="section-label">01 — About</div>
+        <h1>Engineering with curiosity and care.</h1>
+      </section>
+
+      <section class="section">
+        <div class="split">
+          <h2>Who I am.</h2>
+          <div class="prose">
+            <p>
+              I study Computer Systems Engineering with a cybersecurity focus in
+              the Ira A. Fulton Schools of Engineering and Barrett, The Honors
+              College. On campus I’m in the Grand Challenges Scholars Program,
+              EPICS, the Polish Student Association, and SnowDevils.
+            </p>
+            <p>
+              I came up through CREST computer science at Paradise Valley High
+              School. Now I ski, hike, build software, and look for work that
+              mixes systems, security, and people.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-label">Education</div>
+        <h2>Where I’ve studied.</h2>
+        <div class="edu-grid">
+          <article>
+            <span class="label">May 2029</span>
+            <h3>Arizona State University</h3>
+            <p>
+              BSE, Computer Systems Engineering (Cybersecurity) · Ira A. Fulton
+              Schools of Engineering · Barrett, The Honors College
+            </p>
+            <p class="muted">
+              Grand Challenges Scholars Program · EPICS · Polish Student
+              Association · SnowDevils
+            </p>
+          </article>
+          <article>
+            <span class="label">Before ASU</span>
+            <h3>CREST · Paradise Valley</h3>
+            <p>
+              Computer science at the Center for Research in Engineering,
+              Science, and Technology — hardware, programming, and a Seal of
+              Biliteracy.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section beyond">
+        <div class="section-label">Off the clock</div>
+        <h2>What keeps me outside the lab.</h2>
+        <ul class="hobbies">
+          <li>
+            <strong>Coding</strong>
+            <span>Side projects and whatever I’m curious about next.</span>
+          </li>
+          <li>
+            <strong>Community</strong>
+            <span>Polish Student Association and Seniors Empowered in Technology.</span>
+          </li>
+          <li>
+            <strong>Skiing</strong>
+            <span>SnowDevils and a long winter if I’m lucky.</span>
+          </li>
+          <li>
+            <strong>Hiking</strong>
+            <span>Arizona trails and whatever ridgeline is in reach.</span>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>© <span id="year"></span> Piotr Jandura</p>
+      <p>Tempe, Arizona</p>
+    </footer>
+
+    <script src="/script.js"></script>
+  </body>
+</html>

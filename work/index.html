@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Work — Piotr Jandura</title>
+    <meta
+      name="description"
+      content="Selected projects by Piotr Jandura, including ASU EPICS crop drying in Indonesia and a Chick-fil-A iOS inventory app."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="mark" href="/">PJ</a>
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        aria-label="Open menu"
+      >
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links" id="primary-nav" aria-label="Primary">
+        <a href="/about/">About</a>
+        <a href="/experience/">Experience</a>
+        <a href="/work/">Work</a>
+        <a href="/skills/">Skills</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="nav-cta nav-cta-epics" href="https://epics.piotrjandura.com">EPICS</a>
+        <a
+          class="nav-cta"
+          href="https://www.linkedin.com/in/piotrjandura"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn</a
+        >
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="section-label">03 — Selected work</div>
+        <h1>Projects that left the classroom.</h1>
+      </section>
+
+      <section class="section">
+        <div class="cards">
+          <article class="card">
+            <span class="tag">EPICS · Indonesia</span>
+            <h3>Crop drying for cassava farmers</h3>
+            <div
+              class="card-photo card-photo-empty"
+              role="img"
+              aria-label="EPICS Indonesia project photo coming soon"
+            >
+              Photo coming soon
+            </div>
+            <p>
+              With ASU EPICS and Institut Teknologi Bandung, we designed an
+              affordable hybrid-energy dryer so Indonesian farmers can cut
+              cassava spoilage. I served as Budget Lead, Prototyping Co-Lead,
+              and Software Co-Lead — web server, heating control, and sensor
+              data.
+            </p>
+            <p>
+              The prototype hit 60°C and a 50% water reduction in under two
+              days. On site in Bali, Jakarta, and Bandung we visited drying
+              greenhouses, talked with farmers, and ran an international design
+              review against real climate, not a lab assumption.
+            </p>
+            <p class="card-note">
+              Empathy, cultural understanding, and teamwork are not extras.
+              They’re how the engineering actually works.
+            </p>
+            <p>
+              <a href="https://epics.piotrjandura.com">epics.piotrjandura.com</a>
+              — dashboard coming soon.
+            </p>
+          </article>
+          <article class="card">
+            <span class="tag">iOS · Firebase</span>
+            <h3>Waste &amp; inventory tracker</h3>
+            <div
+              class="card-photo card-photo-empty"
+              role="img"
+              aria-label="Chick-fil-A inventory app photo coming soon"
+            >
+              Photo coming soon
+            </div>
+            <p>
+              During a Chick-fil-A internship I built a custom iOS app for
+              waste and inventory tracking. It logged daily usage from 5+
+              devices and stored the data in Firestore so the restaurant could
+              act on it in real time.
+            </p>
+            <p>
+              The goal was practical: less waste, clearer counts, and a tool
+              people on the floor would actually open.
+            </p>
+            <ul class="pills">
+              <li>Swift</li>
+              <li>Xcode</li>
+              <li>Firebase</li>
+              <li>Cloud Firestore</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>© <span id="year"></span> Piotr Jandura</p>
+      <p>Tempe, Arizona</p>
+    </footer>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
