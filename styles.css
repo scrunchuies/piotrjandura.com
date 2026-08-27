@@ -798,11 +798,24 @@ footer {
 
 body.epics-soon {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
+.epics-soon .nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.epics-soon .mark {
+  justify-self: start;
+}
+
 .epics-soon-brand {
+  justify-self: center;
   font-size: 0.82rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -810,13 +823,28 @@ body.epics-soon {
   font-family: var(--mono);
 }
 
+.epics-soon .nav-cta {
+  justify-self: end;
+}
+
 .epics-soon main {
   flex: 1;
-  display: grid;
-  place-items: center;
-  align-content: center;
-  padding: 10vh 6vw 8vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 2.5rem 6vw;
   text-align: center;
+}
+
+.epics-soon-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 40rem;
 }
 
 .epics-soon h1 {
@@ -825,11 +853,19 @@ body.epics-soon {
   font-size: clamp(3.2rem, 12vw, 7rem);
   font-weight: 400;
   line-height: 0.95;
+  text-align: center;
 }
 
 .epics-soon .lede {
-  margin: 0 auto;
+  margin: 0;
   max-width: 28rem;
+  text-align: center;
+}
+
+.epics-soon footer {
+  justify-content: center;
+  text-align: center;
+  gap: 0.35rem 1.5rem;
 }
 
 body.balance-page {
