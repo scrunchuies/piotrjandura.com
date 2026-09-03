@@ -55,6 +55,26 @@
             <button type="button" class="epics-chip" data-unit="g/m³">g/m³</button>
           </div>
         </div>
+        <div class="epics-panel">
+          <span class="label" data-i18n="update">Update</span>
+          <div class="epics-fields">
+            <label class="epics-field">
+              <span data-i18n="autoRefresh">Auto-refresh</span>
+              <select id="refreshMs" class="epics-select">
+                <option value="0" data-i18n-opt="off">Off</option>
+                <option value="500" data-i18n-opt="s05">0.5 s</option>
+                <option value="1000" data-i18n-opt="s1" selected>1 s</option>
+                <option value="2000" data-i18n-opt="s2">2 s</option>
+                <option value="5000" data-i18n-opt="s5">5 s</option>
+              </select>
+            </label>
+            <button type="button" id="refreshNow" class="epics-chip" data-i18n="refreshNow">Refresh now</button>
+            <p class="epics-meta">
+              <span data-i18n="port">Port</span>
+              <span id="port" class="tag">—</span>
+            </p>
+          </div>
+        </div>
         <div class="epics-panel epics-panel-wide">
           <span class="label" data-i18n="chart">Chart</span>
           <div class="epics-fields">
@@ -107,100 +127,78 @@
             </p>
           </div>
         </div>
-        <div class="epics-panel">
-          <span class="label" data-i18n="update">Update</span>
-          <div class="epics-fields">
-            <label class="epics-field">
-              <span data-i18n="autoRefresh">Auto-refresh</span>
-              <select id="refreshMs" class="epics-select">
-                <option value="0" data-i18n-opt="off">Off</option>
-                <option value="500" data-i18n-opt="s05">0.5 s</option>
-                <option value="1000" data-i18n-opt="s1" selected>1 s</option>
-                <option value="2000" data-i18n-opt="s2">2 s</option>
-                <option value="5000" data-i18n-opt="s5">5 s</option>
-              </select>
-            </label>
-            <button type="button" id="refreshNow" class="epics-chip" data-i18n="refreshNow">Refresh now</button>
-            <p class="epics-meta">
-              <span data-i18n="port">Port</span>
-              <span id="port" class="tag">—</span>
-            </p>
+      </section>
+
+      <section class="epics-panel epics-chart-card">
+        <div class="epics-card-top">
+          <div>
+            <p class="label" data-i18n="avgLive">Averages · live</p>
+            <p class="epics-meta" data-i18n="tempHum">temperature / humidity</p>
           </div>
+          <p class="epics-meta">
+            <span data-i18n="updated">Updated</span>
+            <span id="age" data-i18n-alt="noData">no data</span>
+          </p>
+        </div>
+        <div class="epics-chart">
+          <canvas id="chart" aria-label="Temperature and humidity chart"></canvas>
         </div>
       </section>
 
       <div class="epics-layout">
-        <section class="epics-panel epics-chart-card">
+        <section class="epics-panel">
           <div class="epics-card-top">
-            <div>
-              <p class="label" data-i18n="avgLive">Averages · live</p>
-              <p class="epics-meta" data-i18n="tempHum">temperature / humidity</p>
-            </div>
-            <p class="epics-meta">
-              <span data-i18n="updated">Updated</span>
-              <span id="age" data-i18n-alt="noData">no data</span>
-            </p>
+            <p class="label" data-i18n="currAvg">Current averages</p>
+            <p class="epics-meta" data-i18n="status">Status</p>
           </div>
-          <div class="epics-chart">
-            <canvas id="chart" aria-label="Temperature and humidity chart"></canvas>
+          <div class="epics-stat">
+            <span data-i18n="temperature">Temperature</span>
+            <strong id="avgF">--.--</strong>
+          </div>
+          <div class="epics-stat">
+            <span data-i18n="humidity">Humidity</span>
+            <strong id="avgH">--.--</strong>
+          </div>
+          <div class="epics-stat">
+            <span data-i18n="age">Age</span>
+            <em id="ageTag" data-i18n-alt="noData">no data</em>
           </div>
         </section>
 
-        <aside class="epics-side">
-          <section class="epics-panel">
-            <div class="epics-card-top">
-              <p class="label" data-i18n="currAvg">Current averages</p>
-              <p class="epics-meta" data-i18n="status">Status</p>
+        <section class="epics-panel">
+          <p class="label" data-i18n="extras">Extras</p>
+          <div class="epics-extras">
+            <div>
+              <span data-i18n="dewAvg">Dew point</span>
+              <strong id="dew">--.--</strong>
             </div>
-            <div class="epics-stat">
-              <span data-i18n="temperature">Temperature</span>
-              <strong id="avgF">--.--</strong>
+            <div>
+              <span data-i18n="absHumAvg">Abs. humidity</span>
+              <strong id="absHum">--.--</strong>
             </div>
-            <div class="epics-stat">
-              <span data-i18n="humidity">Humidity</span>
-              <strong id="avgH">--.--</strong>
-            </div>
-            <div class="epics-stat">
-              <span data-i18n="age">Age</span>
-              <em id="ageTag" data-i18n-alt="noData">no data</em>
-            </div>
-          </section>
+          </div>
+        </section>
 
-          <section class="epics-panel">
-            <p class="label" data-i18n="extras">Extras</p>
-            <div class="epics-extras">
-              <div>
-                <span data-i18n="dewAvg">Dew point</span>
-                <strong id="dew">--.--</strong>
-              </div>
-              <div>
-                <span data-i18n="absHumAvg">Abs. humidity</span>
-                <strong id="absHum">--.--</strong>
-              </div>
-            </div>
-          </section>
-
-          <section class="epics-panel">
-            <p class="label" data-i18n="sensors">Sensors</p>
-            <div class="epics-sensors">
-              <article>
-                <p class="label">DHT22</p>
-                <div class="epics-stat"><span data-i18n="temp">Temp</span><strong id="t22">--.--</strong></div>
-                <div class="epics-stat"><span data-i18n="hum">Humidity</span><strong id="h22">--.--</strong></div>
-              </article>
-              <article>
-                <p class="label">DHT11A</p>
-                <div class="epics-stat"><span data-i18n="temp">Temp</span><strong id="ta">--.--</strong></div>
-                <div class="epics-stat"><span data-i18n="hum">Humidity</span><strong id="ha">--.--</strong></div>
-              </article>
-              <article>
-                <p class="label">DHT11B</p>
-                <div class="epics-stat"><span data-i18n="temp">Temp</span><strong id="tb">--.--</strong></div>
-                <div class="epics-stat"><span data-i18n="hum">Humidity</span><strong id="hb">--.--</strong></div>
-              </article>
-            </div>
-          </section>
-        </aside>
+        <section class="epics-panel epics-sensors-panel">
+          <p class="label" data-i18n="sensors">Sensors</p>
+          <div class="epics-sensors">
+            <article>
+              <p class="label">DHT22</p>
+              <div class="epics-stat"><span data-i18n="temp">Temp</span><strong id="t22">--.--</strong></div>
+              <div class="epics-stat"><span data-i18n="hum">Humidity</span><strong id="h22">--.--</strong></div>
+            </article>
+            <article>
+              <p class="label">DHT11A</p>
+              <div class="epics-stat"><span data-i18n="temp">Temp</span><strong id="ta">--.--</strong></div>
+              <div class="epics-stat"><span data-i18n="hum">Humidity</span><strong id="ha">--.--</strong></div>
+            </article>
+            <article>
+              <p class="label">DHT11B</p>
+              <div class="epics-stat"><span data-i18n="temp">Temp</span><strong id="tb">--.--</strong></div>
+              <div class="epics-stat"><span data-i18n="hum">Humidity</span><strong id="hb">--.--</strong></div>
+            </article>
+          </div>
+        </section>
       </div>
     </main>
 
