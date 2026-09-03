@@ -130,6 +130,28 @@ const tempSymbol = () => (tempUnit === "F" ? "°F" : tempUnit === "C" ? "°C" : 
 const humSymbol = () => (humUnit === "%" ? "%" : "g/m³");
 const blank = (unit) => `--.-- ${unit}`;
 
+const fitSelect = (sel) => {
+  if (!sel || sel.type === "date") return;
+  const measure = document.createElement("span");
+  const cs = getComputedStyle(sel);
+  measure.style.cssText = [
+    "position:absolute",
+    "left:-9999px",
+    "white-space:nowrap",
+    `font:${cs.font}`,
+    `letter-spacing:${cs.letterSpacing}`,
+    `text-transform:${cs.textTransform}`,
+  ].join(";");
+  measure.textContent = sel.options[sel.selectedIndex]?.text || "";
+  document.body.appendChild(measure);
+  sel.style.width = `${Math.ceil(measure.getBoundingClientRect().width) + 22}px`;
+  measure.remove();
+};
+
+const fitSelects = () => {
+  document.querySelectorAll("select.epics-select").forEach(fitSelect);
+};
+
 const applyI18n = () => {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach((el) => {
@@ -144,6 +166,7 @@ const applyI18n = () => {
   renderYTempSelect();
   paintPlaceholders();
   updateChartCopy();
+  fitSelects();
 };
 
 const renderYTempSelect = () => {
@@ -260,6 +283,7 @@ document.getElementById("lang").addEventListener("change", (event) => {
   lang = event.target.value;
   store("ui.lang", lang);
   applyI18n();
+  fitSelect(event.target);
 });
 
 document.querySelectorAll("#tempUnits .epics-chip").forEach((btn) => {
@@ -290,6 +314,7 @@ document.querySelectorAll("#humUnits .epics-chip").forEach((btn) => {
   el.addEventListener("change", () => {
     store(id, el.value);
     updateChartCopy();
+    fitSelect(el);
   });
 });
 
@@ -319,3 +344,4 @@ setActive();
 applyI18n();
 syncLive();
 initChart();
+fitSelects();

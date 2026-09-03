@@ -24,8 +24,7 @@
       <a class="mark" href="https://piotrjandura.com" aria-label="Piotr Jandura home">PJ</a>
       <span class="epics-soon-brand">EPICS</span>
       <div class="epics-lang">
-        <label class="label" for="lang" data-i18n="language">Language</label>
-        <select id="lang" class="epics-select" aria-label="Language">
+        <select id="lang" class="epics-select epics-select-fit" aria-label="Language">
           <option value="en">English</option>
           <option value="id">Bahasa Indonesia</option>
         </select>
@@ -40,7 +39,7 @@
       </div>
 
       <section class="epics-toolbar" aria-label="Controls">
-        <div class="epics-panel">
+        <div class="epics-group">
           <span class="label" data-i18n="temperature">Temperature</span>
           <div id="tempUnits" class="epics-switch">
             <button type="button" class="epics-chip" data-unit="F">°F</button>
@@ -48,36 +47,33 @@
             <button type="button" class="epics-chip" data-unit="K">K</button>
           </div>
         </div>
-        <div class="epics-panel">
+        <div class="epics-group">
           <span class="label" data-i18n="humidity">Humidity</span>
           <div id="humUnits" class="epics-switch">
             <button type="button" class="epics-chip" data-unit="%">%</button>
             <button type="button" class="epics-chip" data-unit="g/m³">g/m³</button>
           </div>
         </div>
-        <div class="epics-panel">
+        <div class="epics-group">
           <span class="label" data-i18n="update">Update</span>
-          <div class="epics-fields">
-            <label class="epics-field">
-              <span data-i18n="autoRefresh">Auto-refresh</span>
-              <select id="refreshMs" class="epics-select">
-                <option value="0" data-i18n-opt="off">Off</option>
-                <option value="500" data-i18n-opt="s05">0.5 s</option>
-                <option value="1000" data-i18n-opt="s1" selected>1 s</option>
-                <option value="2000" data-i18n-opt="s2">2 s</option>
-                <option value="5000" data-i18n-opt="s5">5 s</option>
-              </select>
-            </label>
+          <div class="epics-inline">
+            <select id="refreshMs" class="epics-select" aria-label="Auto-refresh">
+              <option value="0" data-i18n-opt="off">Off</option>
+              <option value="500" data-i18n-opt="s05">0.5 s</option>
+              <option value="1000" data-i18n-opt="s1" selected>1 s</option>
+              <option value="2000" data-i18n-opt="s2">2 s</option>
+              <option value="5000" data-i18n-opt="s5">5 s</option>
+            </select>
             <button type="button" id="refreshNow" class="epics-chip" data-i18n="refreshNow">Refresh now</button>
-            <p class="epics-meta">
+            <span class="epics-meta">
               <span data-i18n="port">Port</span>
-              <span id="port" class="tag">—</span>
-            </p>
+              <span id="port">—</span>
+            </span>
           </div>
         </div>
-        <div class="epics-panel epics-panel-wide">
+        <div class="epics-group epics-group-chart">
           <span class="label" data-i18n="chart">Chart</span>
-          <div class="epics-fields">
+          <div class="epics-inline">
             <label class="epics-field">
               <span data-i18n="yTempStep">Y temp</span>
               <span class="epics-field-row">
@@ -117,14 +113,14 @@
             </label>
             <label class="epics-field">
               <span data-i18n="date">Date</span>
-              <input id="datePick" class="epics-select" type="date" />
+              <input id="datePick" class="epics-select epics-date" type="date" />
             </label>
             <button type="button" id="btnLive" class="epics-chip" data-i18n="live">Live</button>
-            <p class="epics-meta">
+            <span class="epics-meta">
               <span data-i18n="last">last</span>
               <span id="pointsCount">0</span>
               <span data-i18n="points">points</span>
-            </p>
+            </span>
           </div>
         </div>
       </section>
