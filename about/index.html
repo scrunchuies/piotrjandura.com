@@ -14,13 +14,19 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" href="/images/pj-logo.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
 
     <header class="nav">
-      <a class="mark" href="/">PJ</a>
+      <a class="mark" href="/" aria-label="Piotr Jandura home">
+        <svg class="mark-logo" viewBox="0 0 86 56" aria-hidden="true" focusable="false">
+          <path fill="currentColor" fill-rule="evenodd" d="M2 2h26c13 0 23 8.2 23 20.5S41 43 28 43H14v11H2V2zm12 10v21h13c7 0 12.5-4.4 12.5-10.5S34 12 27 12H14z"/>
+          <path fill="currentColor" d="M84 2H70v28.5c0 8.2-4.6 13-12.4 13-5.4 0-9.4-2-12.2-5.6l-9 7.2C41 50.6 48 55 58.2 55 73.4 55 84 45.2 84 30.2V2z"/>
+        </svg>
+      </a>
       <button
         class="nav-toggle"
         type="button"
@@ -32,11 +38,11 @@
         <span></span>
       </button>
       <nav class="nav-links" id="primary-nav" aria-label="Primary">
-        <a href="/about/">About</a>
-        <a href="/experience/">Experience</a>
-        <a href="/work/">Work</a>
-        <a href="/skills/">Skills</a>
-        <a href="/contact/">Contact</a>
+        <a href="/#about">About</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#work">Work</a>
+        <a href="/#skills">Skills</a>
+        <a href="/#contact">Contact</a>
       </nav>
       <div class="nav-actions">
         <a class="nav-cta nav-cta-epics" href="https://epics.piotrjandura.com">EPICS</a>
@@ -128,7 +134,7 @@
     </main>
 
     <footer>
-      <p>© <span id="year"></span> Piotr Jandura</p>
+      <p>© <span id="year"></span> Piotr Jandura · <a href="/sitemap/">Sitemap</a></p>
       <p>Tempe, Arizona</p>
     </footer>
 

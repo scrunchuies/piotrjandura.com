@@ -22,13 +22,21 @@ window.addEventListener("resize", () => {
   if (window.innerWidth > 900) closeNav();
 });
 
-const normalizePath = (path) => {
-  const clean = path.replace(/index\.html$/, "").replace(/\/+$/, "");
-  return clean || "/";
+const sections = [...document.querySelectorAll("section[id]")];
+const setActive = () => {
+  if (!sections.length) return;
+  const y = window.scrollY + 120;
+  let current = sections[0]?.id;
+  for (const section of sections) {
+    if (section.offsetTop <= y) current = section.id;
+  }
+  links.forEach((link) => {
+    const hash = (link.getAttribute("href") || "").split("#")[1];
+    if (!hash) return;
+    if (hash === current) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
 };
 
-const here = normalizePath(window.location.pathname);
-links.forEach((link) => {
-  const href = normalizePath(new URL(link.getAttribute("href"), window.location.origin).pathname);
-  if (href === here) link.setAttribute("aria-current", "page");
-});
+window.addEventListener("scroll", setActive, { passive: true });
+setActive();
