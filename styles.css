@@ -101,6 +101,15 @@ img {
   gap: 1.5rem;
 }
 
+.nav-actions {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .nav-toggle {
   display: none;
   grid-column: 3;
@@ -155,13 +164,6 @@ img {
 .nav-cta:hover,
 .big-link:hover {
   color: var(--brass);
-}
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
 }
 
 .nav-cta {
@@ -586,6 +588,11 @@ footer a:hover {
 
   .nav-toggle {
     display: inline-flex;
+    order: 3;
+  }
+
+  .nav-actions {
+    order: 2;
     margin-left: auto;
   }
 
@@ -597,6 +604,7 @@ footer a:hover {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
+    order: 4;
   }
 
   .nav.is-open .nav-center {
@@ -614,10 +622,6 @@ footer a:hover {
     gap: 0;
     width: 100%;
     padding: 0.15rem 0 0.35rem;
-  }
-
-  .nav-actions {
-    padding: 0.35rem 0 0.5rem;
   }
 
   .nav-links a {
