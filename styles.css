@@ -80,20 +80,12 @@ img {
 
 .mark {
   font-family: var(--serif);
-  font-size: 1.45rem;
-  letter-spacing: 0.06em;
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
   color: var(--ink);
-  flex-shrink: 0;
-}
-
-.mark-logo {
-  display: block;
-  width: 3.4rem;
-  height: 2.2rem;
   flex-shrink: 0;
 }
 
@@ -702,21 +694,21 @@ footer a:hover {
   }
 }
 
-body.epics-soon {
+body.epics-dash {
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
-.epics-soon .nav {
+.epics-dash .nav {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   flex-wrap: nowrap;
 }
 
-.epics-soon .mark {
+.epics-dash .mark {
   justify-self: start;
 }
 
@@ -729,49 +721,223 @@ body.epics-soon {
   font-family: var(--mono);
 }
 
-.epics-soon .nav-cta {
+.epics-lang {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-.epics-soon main {
+.epics-dash main {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 2.5rem 6vw;
-  text-align: center;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.4rem 6vw 4rem;
 }
 
-.epics-soon-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 40rem;
+.epics-head {
+  margin: 0.35rem 0 1.75rem;
 }
 
-.epics-soon h1 {
-  margin: 0.35rem 0 1rem;
+.epics-dash h1 {
+  margin: 0.2rem 0 0.4rem;
   font-family: var(--serif);
-  font-size: clamp(3.2rem, 12vw, 7rem);
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
   font-weight: 400;
   line-height: 0.95;
-  text-align: center;
 }
 
-.epics-soon .lede {
+.epics-dash .lede {
   margin: 0;
   max-width: 28rem;
-  text-align: center;
 }
 
-.epics-soon footer {
-  justify-content: center;
-  text-align: center;
-  gap: 0.35rem 1.5rem;
+.epics-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.epics-panel {
+  background: linear-gradient(180deg, rgba(243, 238, 230, 0.04), transparent);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1rem 1.1rem 1.05rem;
+  min-width: 0;
+}
+
+.epics-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.epics-switch,
+.epics-fields,
+.epics-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.epics-fields {
+  margin-top: 0.65rem;
+  align-items: flex-end;
+}
+
+.epics-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 7.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.epics-select,
+.epics-chip {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-height: 40px;
+}
+
+.epics-select {
+  padding: 0.4rem 0.8rem;
+  appearance: none;
+  background: rgba(12, 11, 10, 0.4);
+}
+
+.epics-chip {
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.epics-chip.is-on {
+  border-color: rgba(212, 180, 131, 0.55);
+  color: var(--brass);
+}
+
+.epics-badge {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--brass);
+}
+
+.epics-meta {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.epics-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.epics-side {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.epics-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.epics-chart {
+  position: relative;
+  height: 280px;
+  margin-top: 0.9rem;
+}
+
+.epics-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  margin-top: 0.7rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.epics-stat strong,
+.epics-extras strong {
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+}
+
+.epics-stat em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.epics-extras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+}
+
+.epics-extras > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.epics-sensors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+}
+
+.epics-sensors article {
+  border-top: 1px solid var(--line);
+  padding-top: 0.7rem;
+}
+
+.epics-dash footer {
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .epics-layout,
+  .epics-extras,
+  .epics-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .epics-lang .label {
+    display: none;
+  }
 }
 
 body.balance-page {
