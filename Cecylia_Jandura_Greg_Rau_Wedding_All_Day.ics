@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Wedding Calendar Event//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:cecylia-greg-wedding-20270515@example.local
+DTSTAMP:20260917T232600Z
+DTSTART;VALUE=DATE:20270515
+DTEND;VALUE=DATE:20270516
+SUMMARY:The Wedding of Cecylia Jandura & Greg Rau
+LOCATION:New Jersey
+DESCRIPTION:We're excited to celebrate with you — full details to follow in your formal invitation.
+END:VEVENT
+END:VCALENDAR
