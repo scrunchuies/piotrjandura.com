@@ -128,14 +128,34 @@
     var dots = [];
     var INTERVAL = 4500;
 
-    function show(i) {
-      index = (i + slides.length) % slides.length;
-      for (var s = 0; s < slides.length; s++) {
-        slides[s].classList.toggle("is-active", s === index);
-        if (dots[s]) {
-          if (s === index) dots[s].setAttribute("aria-current", "true");
-          else dots[s].removeAttribute("aria-current");
-        }
+    function show(i, dir) {
+      var next = ((i % slides.length) + slides.length) % slides.length;
+      if (next === index) return;
+
+      if (dir == null) {
+        var forward = (next - index + slides.length) % slides.length;
+        var backward = (index - next + slides.length) % slides.length;
+        dir = forward <= backward ? 1 : -1;
+      }
+
+      var current = slides[index];
+      var incoming = slides[next];
+
+      incoming.style.transition = "none";
+      incoming.style.transform = dir > 0 ? "translateX(100%)" : "translateX(-100%)";
+      incoming.offsetHeight;
+      incoming.style.transition = "";
+
+      current.style.transform = dir > 0 ? "translateX(-100%)" : "translateX(100%)";
+      incoming.style.transform = "translateX(0)";
+
+      current.classList.remove("is-active");
+      incoming.classList.add("is-active");
+      index = next;
+
+      for (var s = 0; s < dots.length; s++) {
+        if (s === index) dots[s].setAttribute("aria-current", "true");
+        else dots[s].removeAttribute("aria-current");
       }
     }
 
@@ -150,7 +170,7 @@
       if (reduce) return;
       pause();
       timer = setInterval(function () {
-        show(index + 1);
+        show(index + 1, 1);
       }, INTERVAL);
     }
 
@@ -168,18 +188,19 @@
         dotsWrap.appendChild(btn);
         dots.push(btn);
       });
+      if (dots[0]) dots[0].setAttribute("aria-current", "true");
     }
 
     if (prevBtn) {
       prevBtn.addEventListener("click", function () {
-        show(index - 1);
+        show(index - 1, -1);
         pause();
         play();
       });
     }
     if (nextBtn) {
       nextBtn.addEventListener("click", function () {
-        show(index + 1);
+        show(index + 1, 1);
         pause();
         play();
       });
@@ -199,7 +220,7 @@
         if (!e.changedTouches || !e.changedTouches[0]) return;
         var dx = e.changedTouches[0].clientX - startX;
         if (Math.abs(dx) < 40) return;
-        show(index + (dx < 0 ? 1 : -1));
+        show(index + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
         pause();
         play();
       },
@@ -214,7 +235,6 @@
       else play();
     });
 
-    show(0);
     play();
   }
 

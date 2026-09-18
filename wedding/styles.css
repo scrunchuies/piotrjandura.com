@@ -319,8 +319,13 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.9s ease;
+  transform: translateX(100%);
+  transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-track img.is-active {
+  transform: translateX(0);
+  z-index: 1;
 }
 
 .carousel-track img:nth-child(1) {
