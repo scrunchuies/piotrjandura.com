@@ -1,0 +1,561 @@
+:root {
+  --cream: #fbf7ee;
+  --ink: #222222;
+  --green: #6f946c;
+  --dots: #779274;
+  --olive: #3a421b;
+  --echo-1: rgba(86, 85, 81, 0.7);
+  --echo-2: rgba(174, 172, 165, 0.85);
+  --script: "Pinyon Script", "Parfumerie Script", "Snell Roundhand", cursive;
+  --serif: "Cormorant Garamond", Cormorant, Garamond, "Times New Roman", serif;
+  --display: "Marcellus", "Cormorant Garamond", Georgia, serif;
+  --page: 1024px;
+  --gutter: 60px;
+  --section-height: 576px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.375rem;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+/* Type ------------------------------------------------------------------ */
+
+.script,
+.names {
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 7.8vw, 5rem);
+  line-height: 1.15;
+  color: var(--green);
+  margin: 0;
+}
+
+/* Headings set in Parfumerie Script in the original design; Pinyon Script is
+   wider, so these are sized down to keep a similar footprint. */
+.script-sm {
+  font-size: clamp(2.5rem, 6.6vw, 4.25rem);
+}
+
+.echo {
+  text-shadow:
+    0.03em 0.03em 0 var(--echo-1),
+    0.06em 0.06em 0 var(--echo-2);
+}
+
+.inline-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* Layout ---------------------------------------------------------------- */
+
+.section {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 3rem var(--gutter);
+}
+
+.bleed img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* Hero ------------------------------------------------------------------ */
+
+.hero {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 1.25rem var(--gutter) 3.125rem;
+  text-align: center;
+}
+
+.amp {
+  padding: 0 0.1em;
+}
+
+.date {
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0.25rem 0 1.25rem;
+}
+
+.hero-photo {
+  width: 624px;
+  aspect-ratio: 624 / 378;
+  object-fit: cover;
+  margin: 0 auto;
+}
+
+/* Welcome --------------------------------------------------------------- */
+
+.welcome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+}
+
+.welcome-photos {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  width: 604px;
+  max-width: 100%;
+}
+
+.welcome-kiss {
+  flex: 292 1 0;
+  min-width: 0;
+  aspect-ratio: 292 / 405;
+  object-fit: cover;
+}
+
+.welcome-hands {
+  flex: 294 1 0;
+  min-width: 0;
+  aspect-ratio: 294 / 238;
+  object-fit: cover;
+}
+
+/* Two-column venue / travel sections ------------------------------------- */
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding-block: 1.5rem;
+}
+
+.split-art {
+  text-align: center;
+}
+
+.split-art .script {
+  margin-bottom: 0.5rem;
+}
+
+.lineart {
+  margin: 0 auto;
+}
+
+.lineart-cathedral {
+  width: 252px;
+}
+
+.lineart-club {
+  width: 454px;
+}
+
+.lineart-hotel {
+  width: 473px;
+}
+
+.venue-name {
+  font-weight: 700;
+}
+
+.venue-line a {
+  text-decoration: none;
+}
+
+.venue-line a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.split-copy {
+  text-align: center;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.split-copy p + p {
+  margin-top: 1.4em;
+}
+
+.olive {
+  color: var(--olive);
+}
+
+/* Attire ---------------------------------------------------------------- */
+
+.attire {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  align-items: center;
+  gap: 2rem;
+}
+
+.attire-copy {
+  text-align: center;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.attire-copy .script {
+  margin-bottom: 0.5rem;
+}
+
+.attire-boards {
+  display: flex;
+  justify-content: center;
+  gap: 55px;
+}
+
+.attire-boards img {
+  width: 232px;
+  max-width: 45%;
+  aspect-ratio: 232 / 412;
+  object-fit: cover;
+}
+
+/* Travel ---------------------------------------------------------------- */
+
+.route {
+  display: block;
+  width: 349px;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5rem auto 0;
+}
+
+.travel-copy {
+  max-width: 420px;
+}
+
+.travel-heading {
+  font-weight: 700;
+}
+
+.travel-copy p + p {
+  margin-top: 0;
+}
+
+.travel-copy p + .travel-heading,
+.travel-copy ul + .travel-heading {
+  margin-top: 1.4em;
+}
+
+.travel-copy ul {
+  display: inline-block;
+  text-align: left;
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.travel-copy li::marker {
+  color: #000;
+}
+
+/* RSVP ------------------------------------------------------------------ */
+
+.rsvp {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.rsvp-label {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-top: 1.5rem;
+}
+
+.rsvp-copy {
+  max-width: 440px;
+  margin: 0.5rem 0 1.75rem;
+}
+
+.rsvp-form {
+  width: 100%;
+  max-width: 640px;
+  height: 900px;
+  border: 0;
+  margin-top: 1rem;
+}
+
+/* FAQ ------------------------------------------------------------------- */
+
+.faq {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.faq .script {
+  margin-bottom: 2rem;
+}
+
+.faq-list {
+  width: min(100%, 693px);
+  margin: 0;
+  text-align: left;
+  font-family: var(--display);
+}
+
+.faq-row {
+  display: grid;
+  grid-template-columns: 215px 1fr;
+  gap: 1rem;
+  padding: 1.4rem 0 2rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.faq-row:last-child {
+  border-bottom: 0;
+}
+
+.faq-row dt {
+  font-size: 1.1875rem;
+  line-height: 1.3;
+}
+
+.faq-row dd {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* Contact --------------------------------------------------------------- */
+
+.contact {
+  display: grid;
+  grid-template-columns: 1fr 454px;
+  align-items: center;
+  gap: 2rem;
+}
+
+.contact-copy {
+  font-family: var(--display);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  padding-left: 24px;
+}
+
+.contact-title {
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+}
+
+.contact-card {
+  display: grid;
+  grid-template-columns: 148px 1fr;
+  gap: 0 1rem;
+  margin-bottom: 2.75rem;
+}
+
+.contact-email {
+  margin-top: 0.9rem;
+}
+
+.contact-email a {
+  text-decoration: none;
+}
+
+.contact-email a:hover {
+  text-decoration: underline;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-top: 1rem;
+}
+
+.contact-photo {
+  width: 100%;
+  aspect-ratio: 454 / 388;
+  object-fit: cover;
+}
+
+/* Buttons --------------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 139px;
+  height: 37px;
+  padding: 0 1.25rem;
+  font-family: var(--display);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border: 1.5px solid var(--ink);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.button-solid {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.button-solid:hover {
+  background: #000;
+  border-color: #000;
+}
+
+.button-outline {
+  background: transparent;
+  color: var(--ink);
+}
+
+.button-outline:hover {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+/* Desktop proportions match the 1024 x 576 pages of the original design. */
+
+@media (min-width: 900px) {
+  .section {
+    min-height: var(--section-height);
+  }
+}
+
+/* Responsive ------------------------------------------------------------ */
+
+@media (max-width: 899px) {
+  :root {
+    --gutter: 1.5rem;
+  }
+
+  body {
+    font-size: 1.25rem;
+  }
+
+  .welcome,
+  .split,
+  .attire,
+  .contact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .welcome > *,
+  .split > *,
+  .attire > *,
+  .contact > * {
+    min-width: 0;
+  }
+
+  .welcome-photos,
+  .route,
+  .lineart,
+  .contact-photo {
+    max-width: 100%;
+  }
+
+  .welcome .script {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .welcome-photos {
+    margin: 0 auto;
+  }
+
+  .lineart-club,
+  .lineart-hotel {
+    width: min(100%, 420px);
+  }
+
+  .attire-copy,
+  .split-copy {
+    max-width: 480px;
+  }
+
+  .attire-boards {
+    gap: 2rem;
+  }
+
+  .contact-copy {
+    padding-left: 0;
+  }
+
+  .contact-photo {
+    max-width: 454px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .bleed img {
+    aspect-ratio: 4 / 3;
+  }
+
+  .welcome-photos {
+    gap: 10px;
+  }
+
+  .attire-boards {
+    gap: 1rem;
+  }
+
+  .faq-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+    padding: 1.1rem 0 1.4rem;
+  }
+
+  .faq-row dd {
+    font-size: 0.875rem;
+  }
+
+  .contact-card {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+    margin-bottom: 2rem;
+  }
+
+  .contact-copy {
+    font-size: 0.9375rem;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
