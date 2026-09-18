@@ -122,7 +122,6 @@
     var dotsWrap = root.querySelector(".carousel-dots");
     var prevBtn = root.querySelector(".carousel-prev");
     var nextBtn = root.querySelector(".carousel-next");
-    var side = document.querySelector(".hero-side img");
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var index = 0;
     var timer = null;
@@ -137,10 +136,6 @@
           if (s === index) dots[s].setAttribute("aria-current", "true");
           else dots[s].removeAttribute("aria-current");
         }
-      }
-      if (side) {
-        var next = slides[(index + 1) % slides.length];
-        side.src = next.currentSrc || next.src;
       }
     }
 

@@ -296,17 +296,15 @@ a {
 /* Home: split hero + carousel -------------------------------------------- */
 
 .hero-split {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 8.5vw);
-  gap: 0;
+  display: block;
   width: 100%;
   height: min(86vh, 920px);
 }
 
-.hero-main,
-.hero-side {
+.hero-main {
   position: relative;
-  min-width: 0;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -315,16 +313,12 @@ a {
   inset: 0;
 }
 
-.carousel-track img,
-.hero-side img {
+.carousel-track img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.carousel-track img {
   opacity: 0;
   transition: opacity 0.9s ease;
 }
@@ -348,11 +342,6 @@ a {
 .carousel-track img.is-active {
   opacity: 1;
   z-index: 1;
-}
-
-.hero-side img {
-  object-position: 35% center;
-  transition: opacity 0.9s ease;
 }
 
 .carousel-btn {
@@ -1174,12 +1163,7 @@ a {
   }
 
   .hero-split {
-    grid-template-columns: minmax(0, 1fr);
     height: min(78vh, 680px);
-  }
-
-  .hero-side {
-    display: none;
   }
 
   .monogram {
@@ -1368,8 +1352,7 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .carousel-track img,
-  .hero-side img {
+  .carousel-track img {
     transition: none;
   }
 }
