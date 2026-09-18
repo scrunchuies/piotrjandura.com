@@ -315,7 +315,7 @@ a {
   display: flex;
   height: 100%;
   width: 800%;
-  animation: carousel-marquee 12s linear infinite;
+  animation: carousel-marquee 18s linear infinite;
 }
 
 .carousel-track img {
