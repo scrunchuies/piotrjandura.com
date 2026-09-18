@@ -126,7 +126,7 @@
     var index = 0;
     var timer = null;
     var dots = [];
-    var INTERVAL = 4500;
+    var INTERVAL = 3200;
 
     function show(i, dir) {
       var next = ((i % slides.length) + slides.length) % slides.length;
