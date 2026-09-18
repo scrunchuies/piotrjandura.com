@@ -127,7 +127,7 @@
     var index = 0;
     var timer = null;
     var dots = [];
-    var INTERVAL = 5500;
+    var INTERVAL = 4500;
 
     function show(i) {
       index = (i + slides.length) % slides.length;
@@ -144,18 +144,19 @@
       }
     }
 
-    function play() {
-      if (reduce || timer) return;
-      timer = setInterval(function () {
-        show(index + 1);
-      }, INTERVAL);
-    }
-
     function pause() {
       if (timer) {
         clearInterval(timer);
         timer = null;
       }
+    }
+
+    function play() {
+      if (reduce) return;
+      pause();
+      timer = setInterval(function () {
+        show(index + 1);
+      }, INTERVAL);
     }
 
     if (dotsWrap) {
@@ -210,9 +211,6 @@
       { passive: true }
     );
 
-    root.addEventListener("mouseenter", pause);
-    root.addEventListener("mouseleave", play);
-    root.addEventListener("focusin", pause);
     root.addEventListener("focusout", function () {
       if (!root.contains(document.activeElement)) play();
     });

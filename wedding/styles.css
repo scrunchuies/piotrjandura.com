@@ -5,13 +5,12 @@
   --ink: #222222;
   --muted: #5b5b5b;
   --rule: #4a4a4a;
-  --green: #6f946c;
+  --green: #2f4a2c;
+  --green-mid: #6f946c;
   --green-dark: #0f3d24;
   --dots: #779274;
   --olive: #3a421b;
   --alert: #b0332a;
-  --echo-1: rgba(86, 85, 81, 0.7);
-  --echo-2: rgba(174, 172, 165, 0.85);
   --script: "Pinyon Script", "Parfumerie Script", "Snell Roundhand", cursive;
   --serif: "Cormorant Garamond", Cormorant, Garamond, "Times New Roman", serif;
   --display: "Marcellus", "Cormorant Garamond", Georgia, serif;
@@ -77,9 +76,10 @@ a {
   font-family: var(--script);
   font-weight: 400;
   font-size: clamp(2.5rem, 7vw, 4.5rem);
-  line-height: 1.15;
+  line-height: 1.28;
   color: var(--green);
   margin: 0;
+  letter-spacing: 0.01em;
 }
 
 /* Headings were Parfumerie Script in the original design; Pinyon Script is
@@ -97,9 +97,7 @@ a {
 }
 
 .echo {
-  text-shadow:
-    0.03em 0.03em 0 var(--echo-1),
-    0.06em 0.06em 0 var(--echo-2);
+  text-shadow: none;
 }
 
 .inline-link,
@@ -264,8 +262,8 @@ a {
 }
 
 .button-sage {
-  background: var(--green);
-  border-color: var(--green);
+  background: var(--green-mid);
+  border-color: var(--green-mid);
   color: #fff;
 }
 
@@ -299,9 +297,10 @@ a {
 
 .hero-split {
   display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
-  gap: 4px;
-  height: clamp(280px, 52vw, 560px);
+  grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 8.5vw);
+  gap: 0;
+  width: 100%;
+  height: min(86vh, 920px);
 }
 
 .hero-main,
@@ -331,19 +330,19 @@ a {
 }
 
 .carousel-track img:nth-child(1) {
-  object-position: 50% 18%;
+  object-position: 50% 28%;
 }
 
 .carousel-track img:nth-child(2) {
-  object-position: 22% 40%;
+  object-position: 28% 40%;
 }
 
 .carousel-track img:nth-child(3) {
-  object-position: 42% 78%;
+  object-position: 45% 72%;
 }
 
 .carousel-track img:nth-child(4) {
-  object-position: 50% 75%;
+  object-position: 50% 70%;
 }
 
 .carousel-track img.is-active {
@@ -432,16 +431,16 @@ a {
 
 .monogram {
   position: absolute;
-  left: 58%;
-  top: 60%;
+  left: 50%;
+  top: 52%;
   z-index: 2;
   width: 12.5em;
   height: 12.5em;
-  font-size: clamp(9px, 1.55vw, 17px);
+  font-size: clamp(11px, 1.7vw, 20px);
   transform: translate(-50%, -50%);
   color: #fff;
   pointer-events: none;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.18);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.22);
 }
 
 .monogram span {
@@ -513,18 +512,32 @@ a {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.25rem 1.1rem;
-  margin: 2rem auto 0;
-  font-size: 1rem;
-  min-height: 1.5em;
+  gap: 0.35rem 2rem;
+  margin: 2.4rem auto 0;
+  font-size: clamp(1.15rem, 2.3vw, 1.45rem);
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  color: var(--ink);
+  min-height: 1.6em;
+}
+
+.countdown span {
+  white-space: nowrap;
 }
 
 .countdown b {
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding-right: 0.28em;
 }
 
 .home-intro .button {
-  margin-top: 2.5rem;
+  margin-top: 2.75rem;
+  min-width: 210px;
+  height: 50px;
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+  padding: 0 2.1rem;
 }
 
 /* Home: welcome ---------------------------------------------------------- */
@@ -1162,7 +1175,7 @@ a {
 
   .hero-split {
     grid-template-columns: minmax(0, 1fr);
-    height: min(68vh, 520px);
+    height: min(78vh, 680px);
   }
 
   .hero-side {
@@ -1255,7 +1268,7 @@ a {
   }
 
   .hero-split {
-    height: min(62vh, 460px);
+    height: min(70vh, 560px);
   }
 
   .carousel-btn {
@@ -1282,12 +1295,15 @@ a {
   }
 
   .countdown {
-    font-size: 0.9rem;
-    gap: 0.15rem 0.75rem;
+    font-size: 1.05rem;
+    gap: 0.3rem 1.35rem;
+    letter-spacing: 0.05em;
   }
 
   .home-intro .button {
-    width: min(100%, 220px);
+    width: min(100%, 240px);
+    height: 48px;
+    letter-spacing: 0.18em;
   }
 
   .timeline-actions .button,
