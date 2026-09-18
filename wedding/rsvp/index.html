@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RSVP — Cecylia &amp; Gregory</title>
+    <meta
+      name="description"
+      content="RSVP for Cecylia and Gregory's wedding on May 15, 2027. Find your name to respond for yourself and your party."
+    />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="RSVP — Cecylia &amp; Gregory" />
+    <meta property="og:description" content="Let us know if you can join us on May 15, 2027." />
+    <meta property="og:image" content="https://wedding.piotrjandura.com/images/hero-couple.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Marcellus&family=Pinyon+Script&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../site.js" defer></script>
+    <script src="rsvp.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-title" href="../">Cecylia &amp; Gregory</a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="../">Home</a>
+        <a href="../schedule/">Schedule</a>
+        <a href="../travel/">Travel</a>
+        <a href="../faq/">FAQ</a>
+        <a href="./" aria-current="page">RSVP</a>
+      </nav>
+    </header>
+
+    <main class="section rsvp-page" id="rsvp-app">
+      <h1 class="visually-hidden">RSVP</h1>
+
+      <section class="rsvp-card" id="rsvp-search" aria-labelledby="rsvp-search-copy">
+        <form id="rsvp-search-form" novalidate>
+          <p class="rsvp-card-copy" id="rsvp-search-copy">
+            Please enter the first and last name of one member of your party below.<br />
+            If you're responding for you and a guest (or your family), you'll be able to RSVP for
+            your entire group on the next page.
+          </p>
+          <label class="visually-hidden" for="rsvp-name">First and last name</label>
+          <input
+            class="rsvp-input"
+            id="rsvp-name"
+            name="name"
+            type="text"
+            placeholder="First and Last name"
+            autocomplete="name"
+            autocapitalize="words"
+            required
+          />
+          <p class="hint" id="rsvp-name-hint">
+            Ex. Sarah Fortune (not The Fortune Family or Dr. &amp; Mr. Fortune)
+          </p>
+          <button class="button button-dark button-wide" type="submit">Continue</button>
+        </form>
+      </section>
+
+      <section class="rsvp-results" id="rsvp-results" hidden aria-live="polite"></section>
+
+      <section class="rsvp-event" id="rsvp-events" hidden></section>
+
+      <section class="rsvp-summary" id="rsvp-summary" hidden></section>
+
+      <noscript>
+        <p class="rsvp-notice">
+          The RSVP form needs JavaScript. Please enable it, or reach out to us directly using the
+          details on the <a href="../faq/#contact">FAQ page</a>.
+        </p>
+      </noscript>
+    </main>
+
+    <footer class="site-footer">
+      <p class="script">Cecylia &amp; Gregory</p>
+      <p>Saturday, May 15, 2027 · Florham Park, NJ</p>
+    </footer>
+  </body>
+</html>

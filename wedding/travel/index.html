@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel — Cecylia &amp; Gregory</title>
+    <meta
+      name="description"
+      content="Hotel room block at the Hilton Short Hills, airports, getting around New Jersey, and wedding-day transportation for Cecylia and Gregory's wedding on May 15, 2027."
+    />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Travel — Cecylia &amp; Gregory" />
+    <meta
+      property="og:description"
+      content="Room block at the Hilton Short Hills, airports, and getting around for the wedding on May 15, 2027."
+    />
+    <meta property="og:image" content="https://wedding.piotrjandura.com/images/hero-couple.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Marcellus&family=Pinyon+Script&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-title" href="../">Cecylia &amp; Gregory</a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="../">Home</a>
+        <a href="../schedule/">Schedule</a>
+        <a href="./" aria-current="page">Travel</a>
+        <a href="../faq/">FAQ</a>
+        <a href="../rsvp/">RSVP</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section page-intro">
+        <img
+          class="lineart lineart-hotel"
+          src="../images/hilton-lineart.png"
+          alt="Line drawing of the Hilton Short Hills hotel"
+          width="768"
+          height="430"
+        />
+      </section>
+
+      <section class="section hotel" aria-labelledby="hotel-title">
+        <svg
+          class="icon-bell"
+          viewBox="0 0 48 48"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 33.5a15 15 0 0 1 30 0" />
+          <path d="M5 33.5h38" />
+          <path d="M8 38h32" />
+          <path d="M24 18.5v-4" />
+          <circle cx="24" cy="11.5" r="3" />
+          <path d="M15 27a9.5 9.5 0 0 1 6-6.5" opacity="0.6" />
+        </svg>
+        <p class="label">Hotel</p>
+        <h1 class="script echo" id="hotel-title">Hilton Short Hills</h1>
+        <p class="venue-address">
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Hilton+Short+Hills%2C+41+John+F+Kennedy+Parkway%2C+Millburn%2C+NJ+07078"
+            target="_blank"
+            rel="noopener"
+            >41 John F Kennedy Parkway, Millburn, NJ 07078</a
+          >
+        </p>
+        <p class="hotel-note">We welcome you to use our custom room block to reserve your stay!</p>
+        <p class="hotel-note">
+          Please click below to reserve your room by April 15, 2027, to secure the discounted rate.
+        </p>
+        <!-- TODO(owner): replace href="#" with the Hilton room-block booking link
+             (and add target="_blank" rel="noopener" so it opens in a new tab). -->
+        <a class="button button-dark button-wide" href="#">View</a>
+      </section>
+
+      <section class="section split travel" aria-labelledby="travel-title">
+        <div class="split-art">
+          <h2 class="script script-sm echo" id="travel-title">Getting Here</h2>
+          <svg
+            class="route"
+            viewBox="0 0 349 222"
+            width="349"
+            height="222"
+            role="img"
+            aria-label="Route between two map pins"
+          >
+            <image href="../images/map-pin.png" x="0" y="0" width="76" height="76" />
+            <path
+              d="M72 37 H140 Q160 37 160 57 V163 Q160 183 180 183 H254"
+              fill="none"
+              stroke="#779274"
+              stroke-width="4.5"
+              stroke-dasharray="4.5 4.5"
+            />
+            <image href="../images/map-pin.png" x="273" y="146" width="76" height="76" />
+          </svg>
+        </div>
+        <div class="split-copy travel-copy">
+          <p class="travel-heading">Guests Traveling into New Jersey</p>
+          <p>We recommend flying into EWR (Newark, NJ) or LGA (LaGuardia - New York City, NY).</p>
+          <p class="travel-heading">Guests Traveling within Tri-State Area</p>
+          <ul>
+            <li>All locations are accessible through personal car, Uber/Lyft, or public transit.</li>
+            <li>It is recommended that our guests traveling into the area utilize Uber/Lyft.</li>
+          </ul>
+          <p class="travel-heading travel-note">
+            Transportation will be provided to the Ceremony, Reception, and Hotel on the day of our
+            wedding.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p class="script">Cecylia &amp; Gregory</p>
+      <p>Saturday, May 15, 2027 · Florham Park, NJ · <a href="../rsvp/">RSVP</a></p>
+    </footer>
+  </body>
+</html>

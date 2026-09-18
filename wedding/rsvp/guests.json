@@ -1,0 +1,13 @@
+{
+  "_readme": [
+    "SAMPLE DATA — replace these parties with the real guest list before sharing the site.",
+    "Each party is one household/invitation: a unique `id` (any short string, it is what shows up in the RSVP sheet) and the full names of every guest, spelled the way they will type them.",
+    "Guests find their party by typing their first and last name; matching is case- and accent-insensitive and tolerates small typos.",
+    "This file is public (it is in a public GitHub repo and downloadable from the site), so keep it to names only — no emails, phone numbers, or addresses."
+  ],
+  "parties": [
+    { "id": "sample-fortune", "guests": ["Sarah Fortune", "Tom Fortune"] },
+    { "id": "sample-doe", "guests": ["Jane Doe", "John Doe", "Jamie Doe"] },
+    { "id": "sample-test", "guests": ["Test Guest"] }
+  ]
+}
