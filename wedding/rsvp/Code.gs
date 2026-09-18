@@ -1,41 +1,60 @@
 /**
  * Wedding RSVP → Google Sheet
  *
- * Receives the JSON that wedding/rsvp/rsvp.js POSTs and appends it to a
- * spreadsheet. Deploy once, paste the URL into RSVP_ENDPOINT, done.
+ * Guest list AND responses live in this spreadsheet. The website reads
+ * Guests via JSONP and writes RSVPs via POST.
  *
- * 1. https://sheets.new → create a blank spreadsheet, e.g. "Wedding RSVPs".
- * 2. Extensions → Apps Script → replace everything in Code.gs with this file → Save.
- *    (The script is bound to the sheet, so no spreadsheet ID is needed.)
- * 3. Deploy → New deployment → gear icon → type "Web app":
- *      Description:     rsvp
- *      Execute as:      Me
- *      Who has access:  Anyone
- *    Click Deploy and authorise when prompted (it only touches this spreadsheet).
- * 4. Copy the Web app URL (ends in /exec) into RSVP_ENDPOINT at the top of
- *    wedding/rsvp/rsvp.js, commit, and push the site.
- * 5. Test: open the live RSVP page, respond as a sample guest, then check the
- *    "Responses" and "Latest" tabs here. Opening the /exec URL in a browser
- *    should show {"ok":true,...}.
+ * One-time setup (about two minutes):
+ * 1. Open https://sheets.new and name it "Wedding RSVPs".
+ * 2. Extensions → Apps Script. Delete the stub code, paste THIS file, Save.
+ * 3. Click Run (setupSheets) and authorise when Google asks.
+ * 4. Deploy → New deployment → type "Web app"
+ *      Execute as:     Me
+ *      Who has access: Anyone
+ *    Deploy, then copy the URL that ends in /exec.
+ * 5. Paste that URL into RSVP_ENDPOINT in wedding/rsvp/rsvp.js, commit, push.
  *
- * After editing this file: Deploy → Manage deployments → pencil → Version:
- * "New version" → Deploy. Otherwise the live URL keeps running the old code.
+ * After later edits: Deploy → Manage deployments → pencil → New version → Deploy.
  *
- * Tabs maintained:
- *   Responses  append-only log: one row per guest per event per submission.
- *   Latest     one row per party + guest + event, overwritten when a party
- *              re-submits, so the headcount is simply this tab.
- *
- * Optional script property SPREADSHEET_ID lets a standalone script (not
- * created from the sheet's Extensions menu) target a specific spreadsheet.
+ * Tabs:
+ *   Guests     party id + one guest name per row (edit this; the site reads it)
+ *   Responses  append-only log of every submission
+ *   Latest     one row per party + guest + event (overwritten on re-RSVP)
  */
 
+var GUESTS_SHEET = "Guests";
 var LOG_SHEET = "Responses";
 var LATEST_SHEET = "Latest";
-var HEADERS = ["Received", "Submitted", "Party", "Guest", "Event", "Attending", "Source"];
-var MAX_ROWS_PER_POST = 60; // a party with 30 guests × 2 events
+var GUEST_HEADERS = ["Party", "Guest"];
+var RESPONSE_HEADERS = ["Received", "Submitted", "Party", "Guest", "Event", "Attending", "Source"];
+var MAX_ROWS_PER_POST = 60;
 
-function doGet() {
+function setupSheets() {
+  var ss = openSpreadsheet();
+  sheetWithHeaders(ss, GUESTS_SHEET, GUEST_HEADERS);
+  sheetWithHeaders(ss, LOG_SHEET, RESPONSE_HEADERS);
+  sheetWithHeaders(ss, LATEST_SHEET, RESPONSE_HEADERS);
+  seedGuestsIfEmpty(ss.getSheetByName(GUESTS_SHEET));
+}
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("Wedding RSVP")
+    .addItem("Set up sheets", "setupSheets")
+    .addToUi();
+}
+
+function doGet(e) {
+  var callback = e && e.parameter && e.parameter.callback;
+  if (callback) {
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(callback)) {
+      return jsonResponse({ ok: false, error: "bad callback" });
+    }
+    var payload = { parties: readGuestParties() };
+    return ContentService.createTextOutput(callback + "(" + JSON.stringify(payload) + ")").setMimeType(
+      ContentService.MimeType.JAVASCRIPT
+    );
+  }
   return jsonResponse({ ok: true, service: "wedding-rsvp" });
 }
 
@@ -48,8 +67,8 @@ function doPost(e) {
     if (!rows.length) return jsonResponse({ ok: false, error: "No responses in request" });
 
     var ss = openSpreadsheet();
-    var log = sheetWithHeaders(ss, LOG_SHEET);
-    var latest = sheetWithHeaders(ss, LATEST_SHEET);
+    var log = sheetWithHeaders(ss, LOG_SHEET, RESPONSE_HEADERS);
+    var latest = sheetWithHeaders(ss, LATEST_SHEET, RESPONSE_HEADERS);
     var received = new Date();
 
     rows.forEach(function (r) {
@@ -72,21 +91,56 @@ function openSpreadsheet() {
   return ss;
 }
 
-function sheetWithHeaders(ss, name) {
+function sheetWithHeaders(ss, name, headers) {
   var sheet = ss.getSheetByName(name) || ss.insertSheet(name);
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(HEADERS);
-    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight("bold");
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
     sheet.setFrozenRows(1);
   }
   return sheet;
 }
 
-// Party + Guest + Event identify a row on the Latest tab.
+function seedGuestsIfEmpty(sheet) {
+  if (sheet.getLastRow() > 1) return;
+  [
+    ["sample-fortune", "Sarah Fortune"],
+    ["sample-fortune", "Tom Fortune"],
+    ["sample-doe", "Jane Doe"],
+    ["sample-doe", "John Doe"],
+    ["sample-doe", "Jamie Doe"],
+    ["sample-test", "Test Guest"],
+  ].forEach(function (row) {
+    sheet.appendRow(row);
+  });
+}
+
+function readGuestParties() {
+  var ss = openSpreadsheet();
+  var sheet = ss.getSheetByName(GUESTS_SHEET);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 2).getValues();
+  var byId = {};
+  var order = [];
+  values.forEach(function (row) {
+    var id = String(row[0] || "").replace(/\s+/g, " ").trim();
+    var guest = String(row[1] || "").replace(/\s+/g, " ").trim();
+    if (!id || !guest) return;
+    if (!byId[id]) {
+      byId[id] = { id: id, guests: [] };
+      order.push(id);
+    }
+    if (byId[id].guests.indexOf(guest) === -1) byId[id].guests.push(guest);
+  });
+  return order.map(function (id) {
+    return byId[id];
+  });
+}
+
 function upsertLatest(sheet, row) {
   var last = sheet.getLastRow();
   if (last > 1) {
-    var keys = sheet.getRange(2, 3, last - 1, 3).getValues(); // Party, Guest, Event
+    var keys = sheet.getRange(2, 3, last - 1, 3).getValues();
     for (var i = 0; i < keys.length; i++) {
       if (
         String(keys[i][0]) === String(row[2]) &&
@@ -136,9 +190,11 @@ function normalizeRows(payload) {
   return rows;
 }
 
-// Trim, cap length, and neutralise anything Sheets would treat as a formula.
 function clean(value, max) {
-  var text = String(value == null ? "" : value).replace(/\s+/g, " ").trim().slice(0, max);
+  var text = String(value == null ? "" : value)
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
   return /^[=+\-@]/.test(text) ? "'" + text : text;
 }
 

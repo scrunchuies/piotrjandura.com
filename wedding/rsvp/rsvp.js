@@ -7,8 +7,7 @@
   /* Configuration (edit these) ------------------------------------------ */
 
   // Web app URL (ends in /exec) from deploying wedding/rsvp/Code.gs.
-  // While empty, responses are only saved on the guest's device and the page
-  // shows a notice with a mailto: fallback.
+  // While empty, the page uses guests.json and only saves RSVPs on this device.
   var RSVP_ENDPOINT = "";
 
   // TODO(owner): address guests can email their response to while
@@ -127,29 +126,64 @@
 
   /* Guest list ----------------------------------------------------------- */
 
+  function normalizeParties(json) {
+    var parties = Array.isArray(json && json.parties) ? json.parties : [];
+    return parties
+      .filter(function (party) {
+        return party && party.id != null && Array.isArray(party.guests) && party.guests.length;
+      })
+      .map(function (party) {
+        return {
+          id: String(party.id),
+          guests: party.guests.map(function (guest) {
+            return String(guest).replace(/\s+/g, " ").trim();
+          }),
+        };
+      });
+  }
+
+  function loadPartiesFromSheet() {
+    return new Promise(function (resolve, reject) {
+      var cb = "weddingRsvpGuests_" + String(Date.now());
+      var script = document.createElement("script");
+      var timer = setTimeout(function () {
+        cleanup();
+        reject(new Error("Guest list request timed out"));
+      }, 8000);
+      function cleanup() {
+        clearTimeout(timer);
+        try {
+          delete window[cb];
+        } catch (err) {
+          window[cb] = undefined;
+        }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[cb] = function (data) {
+        cleanup();
+        resolve(data);
+      };
+      script.src =
+        RSVP_ENDPOINT + (RSVP_ENDPOINT.indexOf("?") >= 0 ? "&" : "?") + "callback=" + encodeURIComponent(cb);
+      script.onerror = function () {
+        cleanup();
+        reject(new Error("Guest list request failed"));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
   function loadParties() {
     if (state.parties) return Promise.resolve(state.parties);
-    return fetch(GUESTS_URL, { cache: "no-cache" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("guests.json responded " + res.status);
-        return res.json();
-      })
-      .then(function (json) {
-        var parties = Array.isArray(json.parties) ? json.parties : [];
-        state.parties = parties
-          .filter(function (party) {
-            return party && party.id != null && Array.isArray(party.guests) && party.guests.length;
-          })
-          .map(function (party) {
-            return {
-              id: String(party.id),
-              guests: party.guests.map(function (guest) {
-                return String(guest).replace(/\s+/g, " ").trim();
-              }),
-            };
-          });
-        return state.parties;
-      });
+    var source = RSVP_ENDPOINT ? loadPartiesFromSheet() : fetch(GUESTS_URL, { cache: "no-cache" }).then(function (res) {
+      if (!res.ok) throw new Error("guests.json responded " + res.status);
+      return res.json();
+    });
+    return source.then(function (json) {
+      state.parties = normalizeParties(json);
+      if (!state.parties.length) throw new Error("Guest list is empty");
+      return state.parties;
+    });
   }
 
   /* Matching ------------------------------------------------------------- */
