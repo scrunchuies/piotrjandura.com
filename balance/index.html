@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Household curse tax</title>
+    <meta
+      name="description"
+      content="A public swear jar for Piotr Jandura. Curse, Venmo, get roasted."
+    />
+    <link rel="icon" href="../images/swear-jar-favicon.svg?v=2" type="image/svg+xml" />
+    <link rel="icon" href="../images/swear-jar-favicon.png?v=2" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="../images/swear-jar-touch.png?v=2" />
+    <meta property="og:title" content="Household curse tax" />
+    <meta property="og:image" content="https://balance.piotrjandura.com/images/swear-jar-touch.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css?v=jar-21" />
+  </head>
+  <body class="balance-page">
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="mark jar-mark" href="./" aria-label="Household curse tax">
+        <img
+          src="../images/swear-jar-mark.png"
+          alt=""
+          width="36"
+          height="36"
+        />
+      </a>
+      <span class="epics-soon-brand">Swear jar</span>
+      <div class="nav-cta-row">
+        <a class="nav-cta" href="./growth/index.html">Vault</a>
+        <a class="nav-cta" href="https://piotrjandura.com">piotrjandura.com</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="balance-lockup">
+        <p class="eyebrow">Household curse tax</p>
+        <div class="jar-refresh-row">
+          <p class="balance-updated" id="balance-updated"></p>
+          <button type="button" class="ledger-refresh" id="ledger-refresh">
+            Refresh now
+          </button>
+        </div>
+
+        <div class="swear-jar" aria-hidden="true">
+          <div class="swear-jar-glow"></div>
+          <div class="swear-jar-lid">
+            <span class="swear-jar-slot"></span>
+            <span class="swear-jar-knob"></span>
+            <span class="swear-jar-lid-top"></span>
+            <span class="swear-jar-lid-ring"></span>
+            <span class="swear-jar-lid-band"></span>
+            <span class="swear-jar-lid-band swear-jar-lid-band-2"></span>
+          </div>
+          <div class="swear-jar-threads"></div>
+          <div class="swear-jar-glass">
+            <span class="swear-jar-lip"></span>
+            <img
+              class="swear-jar-loot"
+              src="../images/jar-loot.png"
+              alt=""
+              width="772"
+              height="433"
+            />
+            <span class="swear-jar-seam"></span>
+            <p class="balance-amount" id="balance-amount">$0.00</p>
+            <span class="swear-jar-sticker">Swear jar</span>
+            <span class="swear-jar-shine"></span>
+            <span class="swear-jar-shine swear-jar-shine-edge"></span>
+            <span class="swear-jar-shine swear-jar-shine-lip"></span>
+          </div>
+          <div class="swear-jar-ground"></div>
+        </div>
+
+        <p class="last-curse" id="last-curse" hidden></p>
+
+        <p class="lede">
+          Colorful language has a cover charge. The jar keeps the receipts.
+        </p>
+
+        <div class="jar-streaks" id="jar-streaks" hidden>
+          <div>
+            <span>Quiet streak</span>
+            <strong id="streak-days">—</strong>
+          </div>
+          <div>
+            <span>Longest silence</span>
+            <strong id="streak-quiet">—</strong>
+          </div>
+        </div>
+
+        <div class="balance-stats">
+          <div>
+            <span>Fines</span>
+            <strong id="stat-in">$0.00</strong>
+          </div>
+          <div>
+            <span>Curses</span>
+            <strong id="stat-curses">0</strong>
+          </div>
+          <div>
+            <span>Payments</span>
+            <strong id="stat-count">0</strong>
+          </div>
+        </div>
+
+        <section class="leaderboards" aria-label="Leaderboards">
+          <article>
+            <h2>This week</h2>
+            <ol id="board-week"></ol>
+          </article>
+          <article>
+            <h2>This month</h2>
+            <ol id="board-month"></ol>
+          </article>
+          <article>
+            <h2>All time</h2>
+            <ol id="board-all"></ol>
+          </article>
+        </section>
+
+        <section class="notes-board" aria-labelledby="notes-title">
+          <div class="notes-head">
+            <h2 class="balance-list-title" id="notes-title">Fridge notes</h2>
+            <button class="notes-add" type="button" id="notes-add">
+              + sticky
+            </button>
+          </div>
+          <p class="notes-hint" id="notes-hint">
+            Click a note to write. Everyone sees the same fridge.
+          </p>
+          <div class="sticky-wall" id="sticky-wall"></div>
+        </section>
+
+        <div class="fines-head">
+          <h2 class="balance-list-title">Latest fines</h2>
+          <button class="shame-cert" type="button" id="shame-cert" hidden>
+            Certificate of shame
+          </button>
+        </div>
+        <p class="balance-empty" id="tx-empty">Nobody’s been caught. Yet.</p>
+        <ul class="balance-list" id="tx-list"></ul>
+      </div>
+    </main>
+
+    <div class="shame-save" id="shame-save" hidden>
+      <img id="shame-save-img" alt="Certificate of shame" />
+      <p>Press and hold the image to save it</p>
+      <button type="button" class="shame-save-close" id="shame-save-close">
+        Close
+      </button>
+    </div>
+
+    <footer>
+      <p>© <span id="year"></span> Piotr Jandura</p>
+      <p>balance.piotrjandura.com</p>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="./app.js?v=jar-extras-7"></script>
+  </body>
+</html>

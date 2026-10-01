@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jar vault</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="../../images/swear-jar-favicon.svg?v=2" type="image/svg+xml" />
+    <link rel="icon" href="../../images/swear-jar-favicon.png?v=2" type="image/png" sizes="32x32" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css?v=jar-21" />
+  </head>
+  <body class="balance-page vault-page">
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="mark jar-mark" href="../" aria-label="Household curse tax">
+        <img src="../../images/swear-jar-mark.png" alt="" width="36" height="36" />
+      </a>
+      <span class="epics-soon-brand">Vault</span>
+      <a class="nav-cta" href="../">Back to jar</a>
+    </header>
+
+    <main>
+      <div class="balance-lockup vault-lockup">
+        <p class="eyebrow">Private</p>
+        <h1 class="vault-title">How the jar money is growing</h1>
+        <p class="lede vault-lede">
+          Live from the brokerage, read-only. Use the vault password, not a Fidelity login.
+        </p>
+
+        <form class="vault-card" id="vault-login">
+          <label class="vault-label" for="vault-password">Password</label>
+          <input
+            id="vault-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+          <button class="nav-cta" type="submit">Sign in</button>
+          <p class="vault-status" id="login-status" role="status"></p>
+          <a class="vault-status vault-test" id="vault-test" href="#" target="_blank" rel="noopener" hidden>
+            Open the script directly ↗ (working looks like {"ok":false,"error":"Wrong password."})
+          </a>
+        </form>
+
+        <section class="vault-desk" id="vault-desk" hidden>
+          <div class="balance-stats vault-stats">
+            <div>
+              <span>Account value</span>
+              <strong id="vault-latest">—</strong>
+            </div>
+            <div>
+              <span>Gain</span>
+              <strong id="vault-change">—</strong>
+            </div>
+            <div>
+              <span>Cash</span>
+              <strong id="vault-count">—</strong>
+            </div>
+          </div>
+          <div class="vault-meta-row">
+            <p class="vault-status" id="vault-quote" role="status"></p>
+            <button class="ledger-refresh" type="button" id="vault-refresh">Refresh</button>
+          </div>
+
+          <div class="vault-chart-wrap">
+            <svg
+              class="vault-chart"
+              id="vault-chart"
+              viewBox="0 0 640 260"
+              role="img"
+              aria-label="Account value over time"
+            ></svg>
+            <p class="vault-empty" id="vault-empty">The chart fills in one point per day.</p>
+          </div>
+
+          <ul class="vault-positions" id="vault-positions"></ul>
+
+          <div class="vault-card vault-connect" id="vault-connect-card">
+            <p class="vault-label">Brokerage</p>
+            <p class="vault-status" id="connect-status">
+              Connect Fidelity once. You approve read-only access on Fidelity’s own site.
+            </p>
+            <div class="vault-actions">
+              <button class="nav-cta" type="button" id="vault-connect">Connect Fidelity</button>
+              <button class="ledger-refresh" type="button" id="vault-reconnect" hidden>Reconnect</button>
+              <button class="ledger-refresh" type="button" id="vault-details">Details</button>
+            </div>
+            <pre class="vault-debug" id="vault-debug" hidden></pre>
+          </div>
+
+          <ol class="vault-log" id="vault-log"></ol>
+          <button class="ledger-refresh" type="button" id="vault-logout">Sign out</button>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>© <span id="year"></span> Piotr Jandura</p>
+      <p>Private household vault</p>
+    </footer>
+
+    <script src="../../script.js"></script>
+    <script src="./app.js?v=vault-8"></script>
+  </body>
+</html>
