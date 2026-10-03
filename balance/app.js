@@ -101,7 +101,7 @@ const renderBoard = (id, rows) => {
     const who = document.createElement("strong");
     who.textContent = row.name;
     const meta = document.createElement("em");
-    meta.textContent = `${row.count} · ${money.format(row.total)}`;
+    meta.textContent = money.format(row.total);
     li.append(rank, who, meta);
     list.append(li);
   });

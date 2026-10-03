@@ -1040,6 +1040,8 @@ body.balance-page {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   flex-wrap: nowrap;
+  padding-left: clamp(1.25rem, 2.5vw, 2.5rem);
+  padding-right: clamp(1.25rem, 2.5vw, 2.5rem);
 }
 
 .balance-page .mark {
@@ -1062,7 +1064,7 @@ body.balance-page {
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 2.25rem 6vw 4rem;
+  padding: 2.25rem clamp(1.25rem, 2.5vw, 2.5rem) 4rem;
   text-align: center;
 }
 
@@ -1071,7 +1073,7 @@ body.balance-page {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 46rem;
+  max-width: none;
 }
 
 
@@ -1654,6 +1656,8 @@ body.balance-page {
   justify-content: center;
   text-align: center;
   gap: 0.35rem 1.5rem;
+  padding-left: clamp(1.25rem, 2.5vw, 2.5rem);
+  padding-right: clamp(1.25rem, 2.5vw, 2.5rem);
 }
 
 .balance-stats {
