@@ -990,32 +990,46 @@ function applyDayMove(history, total) {
   var prev = rows[rows.length - 2];
   var last = rows[rows.length - 1];
   var day = roundMoney(last.value - prev.value);
+  var yesterday = Utilities.formatDate(new Date(Date.now() - 86400000), "America/Los_Angeles", "yyyy-MM-dd");
+  var dayLabel = "Since last reading";
+  if (last.date === today && prev.date >= yesterday) dayLabel = "Today";
+  else if (last.date !== today) dayLabel = "Latest day";
   return {
     history: rows,
     hasDay: true,
     day: day,
     dayPct: prev.value ? day / prev.value : null,
     dayAsOf: last.date,
-    dayLabel: last.date === today ? "Today" : "Latest day",
+    dayLabel: dayLabel,
   };
 }
 
 function kickHoldingsRefresh(connections) {
   var props = PropertiesService.getScriptProperties();
   var last = Number(props.getProperty("SNAP_REFRESH_AT") || 0);
-  if (Date.now() - last < 30 * 60 * 1000) return false;
+  if (Date.now() - last < 2 * 60 * 1000) return { asked: false, recent: true, error: "" };
   var asked = false;
+  var error = "";
   (connections || []).forEach(function (conn) {
     if (!conn || !conn.id || conn.disabled) return;
     try {
       snapRequest("get", "/authorizations/" + conn.id + "/refresh", null);
       asked = true;
     } catch (err) {
-      /* A failed refresh should not hide the balance we already have. */
+      error = String(err.message || err);
     }
   });
   if (asked) props.setProperty("SNAP_REFRESH_AT", String(Date.now()));
-  return asked;
+  return { asked: asked, recent: false, error: error };
+}
+
+function newestSync(data) {
+  var latest = "";
+  ((data && data.accounts) || []).forEach(function (account) {
+    var stamp = String((account && account.lastSync) || "");
+    if (stamp > latest) latest = stamp;
+  });
+  return latest;
 }
 
 function fetchBrokerageLive() {
@@ -1186,11 +1200,33 @@ function readBrokerage(force) {
     }
   }
   var live = fetchBrokerageLive();
-  if (force && live.total <= 0 && kickHoldingsRefresh(live.connections)) {
-    live.refreshing = true;
-    live.warnings.push(
-      "Asked Fidelity for a new copy. Wait a few minutes, then press Refresh. Fidelity’s feed can also lag the app by about a day."
-    );
+  if (force) {
+    var beforeSync = newestSync(live);
+    var beforeTotal = live.total;
+    var kicked = kickHoldingsRefresh(live.connections);
+    if (kicked.asked) {
+      live.refreshing = true;
+      live.warnings.push("Asking Fidelity for the latest total…");
+      Utilities.sleep(8000);
+      var again = fetchBrokerageLive();
+      if (again && !again.error) {
+        var moved =
+          Math.abs((again.total || 0) - beforeTotal) > 0.009 ||
+          (newestSync(again) && newestSync(again) !== beforeSync);
+        live = again;
+        live.refreshing = !moved;
+      }
+      if (live.refreshing) {
+        live.warnings.push(
+          "Fidelity has not sent a newer total yet. This page will check again in a few seconds. Their app can stay ahead by about a day."
+        );
+      }
+    } else if (kicked.recent) {
+      live.refreshing = true;
+      live.warnings.push("Still waiting on the Fidelity update from a moment ago.");
+    } else if (kicked.error) {
+      live.warnings.push("Could not ask Fidelity for a new total: " + kicked.error);
+    }
   }
   var settled = live.total > 0 && !live.syncing;
   var stored = settled ? recordHistory(live.total) : readHistory();
@@ -1203,7 +1239,11 @@ function readBrokerage(force) {
   live.dayAsOf = move.dayAsOf;
   live.dayLabel = move.dayLabel;
   delete live.series;
-  cache.put(SNAP_LIVE_KEY, JSON.stringify(live), settled ? SNAP_CACHE_SECONDS : 30);
+  cache.put(
+    SNAP_LIVE_KEY,
+    JSON.stringify(live),
+    live.refreshing ? 10 : settled ? SNAP_CACHE_SECONDS : 30
+  );
   return live;
 }
 

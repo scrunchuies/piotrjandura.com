@@ -95,14 +95,15 @@ const setStatus = (id, text) => {
 // Try fetch first, then the script-tag route; report both reasons if neither works.
 const growth = async (op, extra = {}) => {
   const url = `${apiUrl}?${qs({ action: "growth", op, token, ...extra })}`;
+  const timeout = op === "refresh" ? 55000 : 30000;
   const reasons = [];
   try {
-    return await fetchJson(`${url}&t=${Date.now()}`);
+    return await fetchJson(`${url}&t=${Date.now()}`, timeout);
   } catch (err) {
     reasons.push(`fetch ${err?.message || "failed"}`);
   }
   try {
-    return await jsonp(url);
+    return await jsonp(url, op === "refresh" ? 60000 : 45000);
   } catch (err) {
     reasons.push(`script ${err?.message || "failed"}`);
   }
@@ -223,7 +224,12 @@ const paint = (data) => {
     const at = Date.parse(data.at || "");
     if (!Number.isNaN(at)) bits.push(`as of ${stampFmt.format(new Date(at))}`);
     if (data.syncing) bits.push("first sync still running");
-    if (data.delayed) bits.push("Fidelity’s feed can lag the app by about a day");
+    const syncAt = accounts
+      .map((account) => Date.parse(account.lastSync || ""))
+      .filter((stamp) => !Number.isNaN(stamp))
+      .sort((a, b) => b - a)[0];
+    if (syncAt) bits.push(`Fidelity sent this ${stampFmt.format(new Date(syncAt))}`);
+    if (data.delayed || data.refreshing) bits.push("the Fidelity app can be ahead of this by about a day");
     if (data.hasDay && data.dayLabel !== "Today" && data.dayAsOf) {
       bits.push(`latest move is from ${formatVaultDay(data.dayAsOf)}`);
     }
@@ -431,6 +437,8 @@ document.getElementById("vault-details")?.addEventListener("click", async () => 
   if (btn) btn.textContent = "Hide details";
 });
 
+const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
 document.getElementById("vault-refresh")?.addEventListener("click", async () => {
   const btn = document.getElementById("vault-refresh");
   if (btn) {
@@ -439,6 +447,12 @@ document.getElementById("vault-refresh")?.addEventListener("click", async () => 
   }
   try {
     await loadDesk("refresh");
+    for (let attempt = 0; attempt < 2 && lastData?.refreshing; attempt += 1) {
+      if (btn) btn.textContent = "Checking Fidelity…";
+      await wait(attempt === 0 ? 12000 : 20000);
+      const next = await growthFresh("list");
+      if (next?.ok) paint(next);
+    }
   } catch {
     setStatus("vault-quote", "Refresh failed. Try again in a minute.");
   } finally {
