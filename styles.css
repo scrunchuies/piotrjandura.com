@@ -2139,10 +2139,10 @@ body.balance-page {
 
 .vault-positions li {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.2rem 1rem;
+  padding: 0.75rem 0.85rem;
   border: 1px solid var(--line);
   background: var(--bg-2);
   font-family: var(--mono);
@@ -2155,13 +2155,18 @@ body.balance-page {
 }
 
 .vault-positions span {
+  grid-column: 1;
   color: var(--muted);
-  overflow-wrap: anywhere;
+  white-space: pre-line;
+  overflow-wrap: break-word;
 }
 
 .vault-positions em {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   font-style: normal;
   color: var(--ink);
+  white-space: nowrap;
 }
 
 .vault-connect.is-secondary {
@@ -2219,12 +2224,7 @@ body.balance-page {
 
 @media (max-width: 640px) {
   .vault-positions li {
-    grid-template-columns: auto 1fr;
-  }
-
-  .vault-positions em {
-    grid-column: 2;
-    text-align: right;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 }
 

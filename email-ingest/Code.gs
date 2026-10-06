@@ -897,11 +897,10 @@ function positionRow(pos) {
     // cost_basis is usually per share. If that blows past the position value, it was already the whole cost.
     cost = value > 0 && asPerShare > value * 3 && asTotal <= value * 3 ? asTotal : asPerShare;
   }
-  var pnl = pos.open_pnl != null && isFinite(Number(pos.open_pnl))
-    ? roundMoney(Number(pos.open_pnl))
-    : cost == null
-      ? null
-      : roundMoney(value - cost);
+  var pnl = cost == null ? null : roundMoney(value - cost);
+  if ((pnl == null || pnl === 0) && pos.open_pnl != null && isFinite(Number(pos.open_pnl)) && Number(pos.open_pnl) !== 0) {
+    pnl = roundMoney(Number(pos.open_pnl));
+  }
   var symbol = String(
     instrument.raw_symbol || instrument.symbol || inner.raw_symbol || inner.symbol || ""
   ).toUpperCase();
@@ -916,6 +915,66 @@ function positionRow(pos) {
     pnl: pnl,
     cashEquivalent: Boolean(pos.cash_equivalent),
   };
+}
+
+function isMoneyMarketSymbol(symbol) {
+  return /^(SPAXX|FDRXX|FZFXX|SPRXX|FCASH|FDLXX|FZDXX)$/.test(String(symbol || ""));
+}
+
+function quoteSymbol(symbol) {
+  var cache = CacheService.getScriptCache();
+  var key = "quote:" + symbol;
+  var hit = cache.get(key);
+  if (hit) {
+    try {
+      return JSON.parse(hit);
+    } catch (err) {
+      hit = "";
+    }
+  }
+  var res = UrlFetchApp.fetch(
+    "https://query1.finance.yahoo.com/v8/finance/chart/" +
+      encodeURIComponent(symbol) +
+      "?interval=1d&range=10d",
+    { muteHttpExceptions: true, headers: { "User-Agent": "Mozilla/5.0" } }
+  );
+  if (res.getResponseCode() !== 200) return null;
+  var json = JSON.parse(res.getContentText());
+  var result = json.chart && json.chart.result && json.chart.result[0];
+  if (!result || !result.meta) return null;
+  var closes = (((result.indicators || {}).quote || [])[0] || {}).close || [];
+  var priced = [];
+  closes.forEach(function (close) {
+    var n = moneyAmount(close);
+    if (n != null) priced.push(n);
+  });
+  var last = moneyAmount(result.meta.regularMarketPrice);
+  var prev = priced.length >= 2 ? priced[priced.length - 2] : moneyAmount(result.meta.previousClose);
+  if (last == null) return null;
+  var quote = { price: last, previous: prev };
+  cache.put(key, JSON.stringify(quote), 300);
+  return quote;
+}
+
+function markPositions(positions) {
+  (positions || []).forEach(function (p) {
+    if (!p || p.cashEquivalent || !p.symbol || !p.units) return;
+    var quote = null;
+    try {
+      quote = quoteSymbol(p.symbol);
+    } catch (err) {
+      quote = null;
+    }
+    if (!quote || quote.price == null) return;
+    p.price = quote.price;
+    p.value = roundMoney(Math.abs(p.units) * quote.price);
+    p.marked = true;
+    if (p.cost != null) p.pnl = roundMoney(p.value - p.cost);
+    if (quote.previous != null) {
+      p.day = roundMoney((quote.price - quote.previous) * p.units);
+      p.dayPct = quote.previous ? (quote.price - quote.previous) / quote.previous : null;
+    }
+  });
 }
 
 function loadPositions(accountId) {
@@ -1119,9 +1178,14 @@ function fetchBrokerageLive() {
       if (!account.synced) out.syncing = true;
       try {
         var balances = snapRequest("get", "/accounts/" + acct.id + "/balances", null) || [];
-        account.cash = balances.reduce(function (sum, bal) {
-          return sum + (Number(bal && bal.cash) || 0);
-        }, 0);
+        account.cash = 0;
+        account.buyingPower = 0;
+        balances.forEach(function (bal) {
+          var cash = moneyAmount(bal && bal.cash);
+          var buying = moneyAmount(bal && bal.buying_power);
+          if (cash != null) account.cash += cash;
+          if (buying != null) account.buyingPower += buying;
+        });
       } catch (err) {
         out.warnings.push("Cash unavailable: " + String(err.message || err));
       }
@@ -1133,35 +1197,38 @@ function fetchBrokerageLive() {
       } catch (err) {
         out.warnings.push("Holdings are not available yet: " + String(err.message || err));
       }
-      account.cash = roundMoney(account.cash);
       account.positions.forEach(function (p) {
-        if (/^(SPAXX|FDRXX|FZFXX|SPRXX|FCASH|FDLXX|FZDXX)$/.test(p.symbol)) p.cashEquivalent = true;
+        if (isMoneyMarketSymbol(p.symbol)) p.cashEquivalent = true;
       });
+      markPositions(account.positions);
       var securityValue = 0;
       var sweepValue = 0;
       account.positions.forEach(function (p) {
         if (p.cashEquivalent) sweepValue += p.value;
         else securityValue += p.value;
       });
-      var stacked = roundMoney(securityValue + sweepValue);
       var duplicateSweep =
         securityValue > 20 &&
         sweepValue > 20 &&
         Math.abs(sweepValue - securityValue) / securityValue < 0.25;
-      if (duplicateSweep) {
-        // The money-market line is the same dollars as the fund, still listed after the buy.
-        account.positions = account.positions.filter(function (p) {
-          return !p.cashEquivalent;
-        });
-        account.total =
-          reported != null && reported > 0 && reported < stacked - 1
-            ? roundMoney(reported)
-            : roundMoney(securityValue + account.cash);
+      if (!(account.cash > 0) && account.buyingPower > 0 && account.buyingPower < Math.max(securityValue, 1) * 0.5) {
+        account.cash = account.buyingPower;
+      }
+      account.cash = roundMoney(account.cash);
+      if (duplicateSweep) account.positions = account.positions.filter(function (p) {
+        return !p.cashEquivalent;
+      });
+      var marked = account.positions.some(function (p) {
+        return p.marked;
+      });
+      if (duplicateSweep || marked) {
+        account.total = roundMoney(securityValue + account.cash);
       } else if (reported != null && reported > 0) {
         account.total = roundMoney(reported);
       } else {
         account.total = roundMoney(account.cash + securityValue);
       }
+      delete account.buyingPower;
       try {
         var series = historyRows(
           snapRequest("get", "/accounts/" + account.id + "/balanceHistory", null)
@@ -1180,6 +1247,10 @@ function fetchBrokerageLive() {
           out.pnl += p.pnl;
           out.hasPnl = true;
         }
+        if (p.day != null) {
+          out.day = roundMoney((out.day || 0) + p.day);
+          out.quoteDay = true;
+        }
       });
     });
   });
@@ -1188,6 +1259,13 @@ function fetchBrokerageLive() {
   out.cash = roundMoney(out.cash);
   out.cost = roundMoney(out.cost);
   out.pnl = roundMoney(out.pnl);
+  if (out.quoteDay) {
+    out.day = roundMoney(out.day || 0);
+    var basis = out.total - out.day;
+    out.dayPct = basis ? out.day / basis : null;
+    out.hasDay = true;
+    out.dayLabel = "Today";
+  }
   out.series = mergeHistory(out.series);
   return out;
 }
@@ -1207,6 +1285,10 @@ function recordHistory(total) {
   var today = Utilities.formatDate(new Date(), "America/Los_Angeles", "yyyy-MM-dd");
   var history = readHistory().filter(function (row) {
     return row && row.date !== today;
+  });
+  history = history.filter(function (row) {
+    var twice = total * 2;
+    return !(twice > 0 && Math.abs(row.value - twice) / twice < 0.08);
   });
   history.push({ date: today, value: Math.round(total * 100) / 100 });
   history.sort(function (a, b) {
@@ -1230,23 +1312,28 @@ function readBrokerage(force) {
     var cached = JSON.parse(hit);
     var age = Date.now() - (Date.parse(cached.at || 0) || 0);
     if (!force || age < SNAP_MIN_LIVE_GAP_MS) {
-      var cachedMove = applyDayMove(
-        cached.history && cached.history.length >= 2 ? cached.history : readHistory(),
-        Number(cached.total) || 0
-      );
-      cached.history = cachedMove.history;
-      cached.hasDay = cachedMove.hasDay;
-      cached.day = cachedMove.day;
-      cached.dayPct = cachedMove.dayPct;
-      cached.dayAsOf = cachedMove.dayAsOf;
-      cached.dayLabel = cachedMove.dayLabel;
+      if (!(cached.quoteDay && cached.dayLabel === "Today")) {
+        var cachedMove = applyDayMove(
+          cached.history && cached.history.length >= 2 ? cached.history : readHistory(),
+          Number(cached.total) || 0
+        );
+        cached.history = cachedMove.history;
+        cached.hasDay = cachedMove.hasDay;
+        cached.day = cachedMove.day;
+        cached.dayPct = cachedMove.dayPct;
+        cached.dayAsOf = cachedMove.dayAsOf;
+        cached.dayLabel = cachedMove.dayLabel;
+      }
       cached.cached = true;
       cached.ageSeconds = Math.round(age / 1000);
       return cached;
     }
   }
   var live = fetchBrokerageLive();
-  if (force) {
+  var quoteDay = live.quoteDay
+    ? { hasDay: true, day: live.day, dayPct: live.dayPct, dayLabel: "Today" }
+    : null;
+  if (force && live.delayed) {
     var beforeSync = newestSync(live);
     var beforeTotal = live.total;
     var kicked = kickHoldingsRefresh(live.connections);
@@ -1279,11 +1366,18 @@ function readBrokerage(force) {
   var series = live.series && live.series.length >= 2 ? live.series : stored;
   var move = applyDayMove(series, live.total);
   live.history = move.history;
-  live.hasDay = move.hasDay;
-  live.day = move.day;
-  live.dayPct = move.dayPct;
-  live.dayAsOf = move.dayAsOf;
-  live.dayLabel = move.dayLabel;
+  if (quoteDay) {
+    live.hasDay = true;
+    live.day = quoteDay.day;
+    live.dayPct = quoteDay.dayPct;
+    live.dayLabel = "Today";
+  } else {
+    live.hasDay = move.hasDay;
+    live.day = move.day;
+    live.dayPct = move.dayPct;
+    live.dayAsOf = move.dayAsOf;
+    live.dayLabel = move.dayLabel;
+  }
   delete live.series;
   cache.put(
     SNAP_LIVE_KEY,

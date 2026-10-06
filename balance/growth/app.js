@@ -192,7 +192,12 @@ const paint = (data) => {
     changeEl.classList.remove("is-up", "is-down");
     const day = Number(data.day);
     const pct = Number(data.dayPct);
-    if (hasAccounts && data.hasPnl) {
+    if (hasAccounts && data.hasDay && data.dayLabel === "Today" && Number.isFinite(day)) {
+      changeEl.textContent = Number.isFinite(pct) ? `${signed(day)} (${pctFmt.format(pct)})` : signed(day);
+      if (day > 0) changeEl.classList.add("is-up");
+      if (day < 0) changeEl.classList.add("is-down");
+      if (dayLabelEl) dayLabelEl.textContent = "Today";
+    } else if (hasAccounts && data.hasPnl) {
       const pnl = Number(data.pnl) || 0;
       const cost = Number(data.cost) || 0;
       changeEl.textContent = cost > 0 ? `${signed(pnl)} (${pctFmt.format(pnl / cost)})` : signed(pnl);
@@ -256,25 +261,27 @@ const paint = (data) => {
     accounts.forEach((acct) => {
       (acct.positions || []).forEach((pos) => {
         const item = document.createElement("li");
-        const head = document.createElement("strong");
         const symbol = pos.symbol || "";
         const name = pos.name && pos.name !== symbol ? pos.name : "";
-        head.textContent = [symbol, name].filter(Boolean).join(" · ") || "—";
+        const head = document.createElement("strong");
+        head.textContent = symbol || name || "—";
         const meta = document.createElement("span");
-        const parts = [];
+        const lines = [];
+        if (name && symbol) lines.push(name);
         const shares = Number(pos.units);
+        const detail = [];
         if (shares) {
-          parts.push(
+          detail.push(
             `${Math.abs(shares).toLocaleString("en-US", { maximumFractionDigits: 4 })} ${Math.abs(shares) === 1 ? "share" : "shares"}`
           );
         }
-        if (pos.cashEquivalent) parts.push("cash fund");
-        if (!pos.cashEquivalent && pos.pnl != null) {
-          const gain = signed(Number(pos.pnl));
-          const basis = Number(pos.cost) || 0;
-          parts.push(basis > 0 ? `${gain} (${pctFmt.format(Number(pos.pnl) / basis)})` : gain);
+        if (pos.price) detail.push(money.format(pos.price));
+        if (pos.day != null) {
+          const move = signed(Number(pos.day));
+          detail.push(Number.isFinite(Number(pos.dayPct)) ? `${move} (${pctFmt.format(Number(pos.dayPct))})` : move);
         }
-        meta.textContent = parts.join(" · ");
+        if (detail.length) lines.push(detail.join(" · "));
+        meta.textContent = lines.join("\n");
         const val = document.createElement("em");
         val.textContent = money.format(Number(pos.value) || 0);
         item.append(head, meta, val);
