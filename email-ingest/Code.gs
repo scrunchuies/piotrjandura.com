@@ -883,19 +883,29 @@ function positionRow(pos) {
   var inner = (sym && sym.symbol) || {};
   var units = moneyAmount(pos.units != null ? pos.units : pos.fractional_units) || 0;
   var price = moneyAmount(pos.price) || 0;
-  var costPer = moneyAmount(pos.cost_basis);
-  if (costPer == null) costPer = moneyAmount(pos.average_purchase_price);
-  var value = roundMoney(units * price);
-  var cost = costPer == null ? null : roundMoney(costPer * units);
+  // price is per share. A missing price must not turn the share count into a $0 value.
+  var value = units && price ? roundMoney(Math.abs(units) * price) : 0;
+  var explicit = moneyAmount(pos.market_value);
+  if (!value && explicit != null) value = roundMoney(Math.abs(explicit));
+  var costPer = moneyAmount(pos.average_purchase_price);
+  var costField = moneyAmount(pos.cost_basis);
+  var cost = null;
+  if (costPer != null && units) cost = roundMoney(Math.abs(units) * costPer);
+  else if (costField != null && units) {
+    var asPerShare = roundMoney(Math.abs(units) * costField);
+    var asTotal = roundMoney(costField);
+    // cost_basis is usually per share. If that blows past the position value, it was already the whole cost.
+    cost = value > 0 && asPerShare > value * 3 && asTotal <= value * 3 ? asTotal : asPerShare;
+  }
   var pnl = pos.open_pnl != null && isFinite(Number(pos.open_pnl))
-    ? Number(pos.open_pnl)
+    ? roundMoney(Number(pos.open_pnl))
     : cost == null
       ? null
       : roundMoney(value - cost);
   var symbol = String(
     instrument.raw_symbol || instrument.symbol || inner.raw_symbol || inner.symbol || ""
   ).toUpperCase();
-  var name = String(instrument.description || inner.description || sym.description || symbol);
+  var name = String(instrument.description || inner.description || sym.description || "");
   return {
     symbol: symbol,
     name: name,
@@ -903,7 +913,7 @@ function positionRow(pos) {
     price: price,
     value: value,
     cost: cost,
-    pnl: pnl == null ? null : roundMoney(pnl),
+    pnl: pnl,
     cashEquivalent: Boolean(pos.cash_equivalent),
   };
 }
@@ -1123,15 +1133,18 @@ function fetchBrokerageLive() {
       } catch (err) {
         out.warnings.push("Holdings are not available yet: " + String(err.message || err));
       }
-      var summed =
-        account.cash +
-        account.positions.reduce(function (sum, p) {
-          return sum + p.value;
-        }, 0);
-      // Fidelity's own total includes holdings SnapTrade may not list yet.
-      // Keep whichever figure is larger so a missing position list cannot zero the account.
-      account.total = roundMoney(Math.max(account.total, summed));
       account.cash = roundMoney(account.cash);
+      // Money-market funds are already inside cash. Leave them out of the stock total
+      // so they are not added on top of the brokerage balance.
+      var stockValue = account.positions.reduce(function (sum, p) {
+        return p.cashEquivalent ? sum : sum + p.value;
+      }, 0);
+      // The account total is the figure Fidelity reported. Only fall back to
+      // cash plus stocks when that figure is missing.
+      if (!(reported != null && reported > 0)) {
+        account.total = roundMoney(account.cash + stockValue);
+      }
+      account.total = roundMoney(account.total);
       try {
         var series = historyRows(
           snapRequest("get", "/accounts/" + account.id + "/balanceHistory", null)
@@ -1144,6 +1157,7 @@ function fetchBrokerageLive() {
       out.total += account.total;
       out.cash += account.cash;
       account.positions.forEach(function (p) {
+        if (p.cashEquivalent) return;
         if (p.cost != null) out.cost += p.cost;
         if (p.pnl != null) {
           out.pnl += p.pnl;

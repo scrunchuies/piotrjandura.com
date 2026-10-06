@@ -198,7 +198,7 @@ const paint = (data) => {
       changeEl.textContent = cost > 0 ? `${signed(pnl)} (${pctFmt.format(pnl / cost)})` : signed(pnl);
       if (pnl > 0) changeEl.classList.add("is-up");
       if (pnl < 0) changeEl.classList.add("is-down");
-      if (dayLabelEl) dayLabelEl.textContent = "Since deposit";
+      if (dayLabelEl) dayLabelEl.textContent = "Account gain";
     } else if (hasAccounts && data.hasDay && Number.isFinite(day) && day !== 0) {
       changeEl.textContent = Number.isFinite(pct) ? `${signed(day)} (${pctFmt.format(pct)})` : signed(day);
       if (day > 0) changeEl.classList.add("is-up");
@@ -259,16 +259,20 @@ const paint = (data) => {
         const head = document.createElement("strong");
         const symbol = pos.symbol || "";
         const name = pos.name && pos.name !== symbol ? pos.name : "";
-        head.textContent = symbol || name || "—";
+        head.textContent = [symbol, name].filter(Boolean).join(" · ") || "—";
         const meta = document.createElement("span");
         const parts = [];
-        if (name) parts.push(name);
-        if (pos.units) parts.push(`${Number(pos.units).toLocaleString("en-US", { maximumFractionDigits: 4 })} sh`);
-        if (pos.price) parts.push(`@ ${money.format(pos.price)}`);
-        if (pos.pnl != null) {
+        const shares = Number(pos.units);
+        if (shares) {
+          parts.push(
+            `${Math.abs(shares).toLocaleString("en-US", { maximumFractionDigits: 4 })} ${Math.abs(shares) === 1 ? "share" : "shares"}`
+          );
+        }
+        if (pos.cashEquivalent) parts.push("cash fund");
+        if (!pos.cashEquivalent && pos.pnl != null) {
           const gain = signed(Number(pos.pnl));
           const basis = Number(pos.cost) || 0;
-          parts.push(basis > 0 ? `since deposit ${gain} (${pctFmt.format(Number(pos.pnl) / basis)})` : `since deposit ${gain}`);
+          parts.push(basis > 0 ? `${gain} (${pctFmt.format(Number(pos.pnl) / basis)})` : gain);
         }
         meta.textContent = parts.join(" · ");
         const val = document.createElement("em");
