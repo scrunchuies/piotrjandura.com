@@ -1134,17 +1134,34 @@ function fetchBrokerageLive() {
         out.warnings.push("Holdings are not available yet: " + String(err.message || err));
       }
       account.cash = roundMoney(account.cash);
-      // Money-market funds are already inside cash. Leave them out of the stock total
-      // so they are not added on top of the brokerage balance.
-      var stockValue = account.positions.reduce(function (sum, p) {
-        return p.cashEquivalent ? sum : sum + p.value;
-      }, 0);
-      // The account total is the figure Fidelity reported. Only fall back to
-      // cash plus stocks when that figure is missing.
-      if (!(reported != null && reported > 0)) {
-        account.total = roundMoney(account.cash + stockValue);
+      account.positions.forEach(function (p) {
+        if (/^(SPAXX|FDRXX|FZFXX|SPRXX|FCASH|FDLXX|FZDXX)$/.test(p.symbol)) p.cashEquivalent = true;
+      });
+      var securityValue = 0;
+      var sweepValue = 0;
+      account.positions.forEach(function (p) {
+        if (p.cashEquivalent) sweepValue += p.value;
+        else securityValue += p.value;
+      });
+      var stacked = roundMoney(securityValue + sweepValue);
+      var duplicateSweep =
+        securityValue > 20 &&
+        sweepValue > 20 &&
+        Math.abs(sweepValue - securityValue) / securityValue < 0.25;
+      if (duplicateSweep) {
+        // The money-market line is the same dollars as the fund, still listed after the buy.
+        account.positions = account.positions.filter(function (p) {
+          return !p.cashEquivalent;
+        });
+        account.total =
+          reported != null && reported > 0 && reported < stacked - 1
+            ? roundMoney(reported)
+            : roundMoney(securityValue + account.cash);
+      } else if (reported != null && reported > 0) {
+        account.total = roundMoney(reported);
+      } else {
+        account.total = roundMoney(account.cash + securityValue);
       }
-      account.total = roundMoney(account.total);
       try {
         var series = historyRows(
           snapRequest("get", "/accounts/" + account.id + "/balanceHistory", null)
@@ -1253,7 +1270,7 @@ function readBrokerage(force) {
     } else if (kicked.recent) {
       live.refreshing = true;
       live.warnings.push("Still waiting on the Fidelity update from a moment ago.");
-    } else if (kicked.error) {
+    } else if (kicked.error && !/real-time plan|already return/i.test(kicked.error)) {
       live.warnings.push("Could not ask Fidelity for a new total: " + kicked.error);
     }
   }
