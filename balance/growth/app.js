@@ -9,6 +9,17 @@ const pctFmt = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
+const vaultDayFmt = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Los_Angeles",
+  month: "short",
+  day: "numeric",
+});
+
+const formatVaultDay = (value) => {
+  const d = new Date(`${value}T12:00:00`);
+  return Number.isNaN(d.getTime()) ? value : vaultDayFmt.format(d);
+};
+
 const stampFmt = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Los_Angeles",
   month: "short",
@@ -172,16 +183,29 @@ const paint = (data) => {
 
   const latestEl = document.getElementById("vault-latest");
   const changeEl = document.getElementById("vault-change");
+  const dayLabelEl = document.getElementById("vault-day-label");
   const cashEl = document.getElementById("vault-count");
   if (latestEl) latestEl.textContent = hasAccounts ? money.format(Number(data.total) || 0) : "—";
   if (cashEl) cashEl.textContent = hasAccounts ? money.format(Number(data.cash) || 0) : "—";
   if (changeEl) {
-    if (hasAccounts && data.hasPnl) {
+    changeEl.classList.remove("is-up", "is-down");
+    const day = Number(data.day);
+    const pct = Number(data.dayPct);
+    if (hasAccounts && data.hasDay && Number.isFinite(day)) {
+      changeEl.textContent = Number.isFinite(pct) ? `${signed(day)} (${pctFmt.format(pct)})` : signed(day);
+      if (day > 0) changeEl.classList.add("is-up");
+      if (day < 0) changeEl.classList.add("is-down");
+      if (dayLabelEl) dayLabelEl.textContent = data.dayLabel || "Today";
+    } else if (hasAccounts && data.hasPnl) {
       const pnl = Number(data.pnl) || 0;
       const cost = Number(data.cost) || 0;
-      changeEl.textContent = cost > 0 ? `${signed(pnl)} · ${pctFmt.format(pnl / cost)}` : signed(pnl);
+      changeEl.textContent = cost > 0 ? `${signed(pnl)} (${pctFmt.format(pnl / cost)})` : signed(pnl);
+      if (pnl > 0) changeEl.classList.add("is-up");
+      if (pnl < 0) changeEl.classList.add("is-down");
+      if (dayLabelEl) dayLabelEl.textContent = "Since buy";
     } else {
       changeEl.textContent = "—";
+      if (dayLabelEl) dayLabelEl.textContent = "Today";
     }
   }
 
@@ -199,7 +223,10 @@ const paint = (data) => {
     const at = Date.parse(data.at || "");
     if (!Number.isNaN(at)) bits.push(`as of ${stampFmt.format(new Date(at))}`);
     if (data.syncing) bits.push("first sync still running");
-    if (data.delayed) bits.push("this brokerage sends end-of-day data, not live ticks");
+    if (data.delayed) bits.push("Fidelity’s feed can lag the app by about a day");
+    if (data.hasDay && data.dayLabel !== "Today" && data.dayAsOf) {
+      bits.push(`latest move is from ${formatVaultDay(data.dayAsOf)}`);
+    }
   } else if (linked) {
     bits.push(`${brokerNames.join(", ") || "Brokerage"} is connected`);
     bits.push(

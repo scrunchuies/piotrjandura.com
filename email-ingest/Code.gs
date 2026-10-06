@@ -13,6 +13,8 @@
  *      SELF_NAME       = Piotr   (optional; who “You paid” should be billed as)
  *      JAR_PAYEE_NAMES = comma list of Venmo names for the jar account
  *                        (default: swear jar,swearjar,jar,piotr,piotr jandura)
+ *    A Venmo note like "name: jeff" (also Name: / NAME:) bills that person
+ *    instead of the Venmo sender. No name: keeps the sender.
  *      GROWTH_PASSWORD = shared password for the private vault page
  *                        (not your Fidelity password)
  *      SNAPTRADE_CLIENT_ID / SNAPTRADE_CONSUMER_KEY
@@ -293,15 +295,22 @@ function isJarAccountName(name) {
 
 function asJarDeposit(parsed) {
   if (!parsed || !parsed.amount) return null;
+  const named = firstName(parsed.commentName || "");
   if (parsed.type === "received") {
-    if (isJarAccountName(parsed.from)) return null;
+    if (!named && isJarAccountName(parsed.from)) return null;
     if (/^bank transfer$/i.test(firstName(parsed.from))) return null;
+    if (named) {
+      const copy = {};
+      for (const key in parsed) copy[key] = parsed[key];
+      copy.from = named;
+      return copy;
+    }
     return parsed;
   }
   if (parsed.type === "sent" && isJarPayee(parsed.to)) {
     return {
       type: "received",
-      from: firstName(selfPayerName()),
+      from: named || firstName(selfPayerName()),
       amount: parsed.amount,
     };
   }
@@ -553,12 +562,15 @@ function pack(type, amountRaw, from, to, body, cleaned) {
   const noteMatch =
     body.match(/(?:note|for|memo)[:\s]+(.{1,80})/i) ||
     cleaned.match(/\s[—–-]\s+(.{1,80})$/);
+  const note = noteMatch ? cleanName(noteMatch[1]) : "";
+  const commentName = firstName(extractCommentName(note + "\n" + body + "\n" + cleaned));
   return {
     type: type,
     amount: amount,
-    from: firstName(from),
+    from: type === "received" && commentName ? commentName : firstName(from),
     to: firstName(to),
-    note: noteMatch ? cleanName(noteMatch[1]) : "",
+    note: note,
+    commentName: commentName,
   };
 }
 
@@ -589,6 +601,17 @@ function firstName(raw) {
   const token = name.split(/\s+/)[0];
   if (/^doan$/i.test(token)) return "Lucia";
   return token;
+}
+
+function extractCommentName(text) {
+  const re = /\bname\s*:\s*([A-Za-z][A-Za-z .'-]{0,40})/gi;
+  var last = "";
+  var match;
+  while ((match = re.exec(String(text || "")))) {
+    const name = cleanName(match[1]);
+    if (name && !/^name$/i.test(name)) last = name;
+  }
+  return last;
 }
 
 function githubHeaders(token) {
@@ -897,6 +920,104 @@ function maskNumber(raw) {
   return s.length > 4 ? "…" + s.slice(-4) : s;
 }
 
+function moneyAmount(value) {
+  if (value == null || value === "") return null;
+  if (typeof value === "number") return isFinite(value) ? value : null;
+  if (typeof value === "string") {
+    var n = Number(String(value).replace(/[$,]/g, ""));
+    return isFinite(n) ? n : null;
+  }
+  if (typeof value === "object") {
+    if (value.amount != null) return moneyAmount(value.amount);
+    if (value.value != null) return moneyAmount(value.value);
+  }
+  return null;
+}
+
+function roundMoney(n) {
+  return Math.round(Number(n) * 100) / 100;
+}
+
+function historyRows(data) {
+  var list = [];
+  if (data && Array.isArray(data.history)) list = data.history;
+  else if (Array.isArray(data)) list = data;
+  var rows = [];
+  list.forEach(function (row) {
+    if (!row) return;
+    var value = moneyAmount(row.total_value != null ? row.total_value : row.value);
+    var date = String(row.date || row.timestamp || "").slice(0, 10);
+    if (!date || value == null) return;
+    rows.push({ date: date, value: roundMoney(value) });
+  });
+  rows.sort(function (a, b) {
+    return a.date.localeCompare(b.date);
+  });
+  return rows;
+}
+
+function mergeHistory(seriesList) {
+  var byDate = {};
+  (seriesList || []).forEach(function (series) {
+    (series || []).forEach(function (row) {
+      byDate[row.date] = roundMoney((byDate[row.date] || 0) + row.value);
+    });
+  });
+  return Object.keys(byDate)
+    .sort()
+    .map(function (date) {
+      return { date: date, value: byDate[date] };
+    });
+}
+
+function applyDayMove(history, total) {
+  var today = Utilities.formatDate(new Date(), "America/Los_Angeles", "yyyy-MM-dd");
+  var rows = (history || []).filter(function (row) {
+    return row && row.date && isFinite(Number(row.value));
+  });
+  if (isFinite(total) && total > 0) {
+    rows = rows.filter(function (row) {
+      return row.date !== today;
+    });
+    rows.push({ date: today, value: roundMoney(total) });
+  }
+  rows.sort(function (a, b) {
+    return a.date.localeCompare(b.date);
+  });
+  if (rows.length < 2) {
+    return { history: rows, hasDay: false, day: 0, dayPct: null, dayAsOf: "", dayLabel: "Today" };
+  }
+  var prev = rows[rows.length - 2];
+  var last = rows[rows.length - 1];
+  var day = roundMoney(last.value - prev.value);
+  return {
+    history: rows,
+    hasDay: true,
+    day: day,
+    dayPct: prev.value ? day / prev.value : null,
+    dayAsOf: last.date,
+    dayLabel: last.date === today ? "Today" : "Latest day",
+  };
+}
+
+function kickHoldingsRefresh(connections) {
+  var props = PropertiesService.getScriptProperties();
+  var last = Number(props.getProperty("SNAP_REFRESH_AT") || 0);
+  if (Date.now() - last < 30 * 60 * 1000) return false;
+  var asked = false;
+  (connections || []).forEach(function (conn) {
+    if (!conn || !conn.id || conn.disabled) return;
+    try {
+      snapRequest("get", "/authorizations/" + conn.id + "/refresh", null);
+      asked = true;
+    } catch (err) {
+      /* A failed refresh should not hide the balance we already have. */
+    }
+  });
+  if (asked) props.setProperty("SNAP_REFRESH_AT", String(Date.now()));
+  return asked;
+}
+
 function fetchBrokerageLive() {
   var out = {
     ok: true,
@@ -906,6 +1027,7 @@ function fetchBrokerageLive() {
     at: new Date().toISOString(),
     connections: [],
     accounts: [],
+    series: [],
     total: 0,
     cash: 0,
     cost: 0,
@@ -933,18 +1055,25 @@ function fetchBrokerageLive() {
 
     accounts.forEach(function (acct) {
       if (!acct) return;
-      if (acct.account_category && acct.account_category !== "INVESTMENT") return;
       if (acct.status === "closed" || acct.status === "archived") return;
-      var sync = (acct.sync_status && acct.sync_status.holdings) || {};
+      var detail = acct;
+      try {
+        var fetched = snapRequest("get", "/accounts/" + acct.id, null);
+        if (fetched && fetched.id) detail = fetched;
+      } catch (err) {
+        out.warnings.push("Account value unavailable: " + String(err.message || err));
+      }
+      var sync = (detail.sync_status && detail.sync_status.holdings) || {};
+      var reported = moneyAmount(detail.balance && detail.balance.total);
       var account = {
-        id: acct.id,
-        name: String(acct.name || row.brokerage || "Account"),
-        number: maskNumber(acct.number),
-        institution: String(acct.institution_name || row.brokerage || ""),
+        id: detail.id || acct.id,
+        name: String(detail.name || row.brokerage || "Account"),
+        number: maskNumber(detail.number || acct.number),
+        institution: String(detail.institution_name || row.brokerage || ""),
         synced: sync.initial_sync_completed !== false,
         lastSync: String(sync.last_successful_sync || ""),
         holdingsUnavailable: Boolean(sync.holdings_unavailable),
-        total: Number(acct.balance && acct.balance.total && acct.balance.total.amount) || 0,
+        total: reported == null ? 0 : reported,
         cash: 0,
         positions: [],
       };
@@ -965,15 +1094,23 @@ function fetchBrokerageLive() {
       } catch (err) {
         out.warnings.push("Positions unavailable: " + String(err.message || err));
       }
-      if (!account.total) {
-        account.total =
-          account.cash +
-          account.positions.reduce(function (sum, p) {
-            return sum + p.value;
-          }, 0);
+      var summed =
+        account.cash +
+        account.positions.reduce(function (sum, p) {
+          return sum + p.value;
+        }, 0);
+      // Fidelity's own total includes holdings SnapTrade may not list yet.
+      // Keep whichever figure is larger so a missing position list cannot zero the account.
+      account.total = roundMoney(Math.max(account.total, summed));
+      account.cash = roundMoney(account.cash);
+      try {
+        var series = historyRows(
+          snapRequest("get", "/accounts/" + account.id + "/balanceHistory", null)
+        );
+        if (series.length) out.series.push(series);
+      } catch (err) {
+        /* Balance history is optional and off unless enabled in SnapTrade. */
       }
-      account.total = Math.round(account.total * 100) / 100;
-      account.cash = Math.round(account.cash * 100) / 100;
       out.accounts.push(account);
       out.total += account.total;
       out.cash += account.cash;
@@ -987,10 +1124,11 @@ function fetchBrokerageLive() {
     });
   });
 
-  out.total = Math.round(out.total * 100) / 100;
-  out.cash = Math.round(out.cash * 100) / 100;
-  out.cost = Math.round(out.cost * 100) / 100;
-  out.pnl = Math.round(out.pnl * 100) / 100;
+  out.total = roundMoney(out.total);
+  out.cash = roundMoney(out.cash);
+  out.cost = roundMoney(out.cost);
+  out.pnl = roundMoney(out.pnl);
+  out.series = mergeHistory(out.series);
   return out;
 }
 
@@ -1032,16 +1170,40 @@ function readBrokerage(force) {
     var cached = JSON.parse(hit);
     var age = Date.now() - (Date.parse(cached.at || 0) || 0);
     if (!force || age < SNAP_MIN_LIVE_GAP_MS) {
-      cached.history = readHistory();
+      var cachedMove = applyDayMove(
+        cached.history && cached.history.length >= 2 ? cached.history : readHistory(),
+        Number(cached.total) || 0
+      );
+      cached.history = cachedMove.history;
+      cached.hasDay = cachedMove.hasDay;
+      cached.day = cachedMove.day;
+      cached.dayPct = cachedMove.dayPct;
+      cached.dayAsOf = cachedMove.dayAsOf;
+      cached.dayLabel = cachedMove.dayLabel;
       cached.cached = true;
       cached.ageSeconds = Math.round(age / 1000);
       return cached;
     }
   }
   var live = fetchBrokerageLive();
-  var settled = live.accounts.length > 0 && !live.syncing;
+  if (force && live.total <= 0 && kickHoldingsRefresh(live.connections)) {
+    live.refreshing = true;
+    live.warnings.push(
+      "Asked Fidelity for a new copy. Wait a few minutes, then press Refresh. Fidelity’s feed can also lag the app by about a day."
+    );
+  }
+  var settled = live.total > 0 && !live.syncing;
+  var stored = settled ? recordHistory(live.total) : readHistory();
+  var series = live.series && live.series.length >= 2 ? live.series : stored;
+  var move = applyDayMove(series, live.total);
+  live.history = move.history;
+  live.hasDay = move.hasDay;
+  live.day = move.day;
+  live.dayPct = move.dayPct;
+  live.dayAsOf = move.dayAsOf;
+  live.dayLabel = move.dayLabel;
+  delete live.series;
   cache.put(SNAP_LIVE_KEY, JSON.stringify(live), settled ? SNAP_CACHE_SECONDS : 30);
-  live.history = settled ? recordHistory(live.total) : readHistory();
   return live;
 }
 
@@ -1092,10 +1254,23 @@ function snapDebug() {
       });
     }) || [];
   conns.forEach(function (c) {
-    step("GET /authorizations/" + c.id + "/accounts", function () {
-      return (snapRequest("get", "/authorizations/" + c.id + "/accounts", null) || []).map(
-        accountSummary
-      );
+    var accounts =
+      step("GET /authorizations/" + c.id + "/accounts", function () {
+        return (snapRequest("get", "/authorizations/" + c.id + "/accounts", null) || []).map(
+          accountSummary
+        );
+      }) || [];
+    accounts.forEach(function (a) {
+      if (!a || !a.id) return;
+      step("GET /accounts/" + a.id, function () {
+        var detail = snapRequest("get", "/accounts/" + a.id, null) || {};
+        return {
+          name: detail.name,
+          status: detail.status,
+          balance: detail.balance,
+          sync: detail.sync_status,
+        };
+      });
     });
   });
   step("GET /accounts", function () {

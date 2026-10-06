@@ -2077,6 +2077,14 @@ body.balance-page {
   margin: 0;
 }
 
+.vault-stats .is-up {
+  color: var(--sage);
+}
+
+.vault-stats .is-down {
+  color: #d08a7c;
+}
+
 .vault-chart-wrap {
   position: relative;
   border: 1px solid var(--line);
