@@ -1207,27 +1207,27 @@ function fetchBrokerageLive() {
         if (p.cashEquivalent) sweepValue += p.value;
         else securityValue += p.value;
       });
+      var settled = account.cash;
+      if (!(settled > 0) && account.buyingPower > 0 && account.buyingPower < Math.max(securityValue, 1) * 0.5) {
+        settled = account.buyingPower;
+      }
       var duplicateSweep =
         securityValue > 20 &&
         sweepValue > 20 &&
         Math.abs(sweepValue - securityValue) / securityValue < 0.25;
-      if (!(account.cash > 0) && account.buyingPower > 0 && account.buyingPower < Math.max(securityValue, 1) * 0.5) {
-        account.cash = account.buyingPower;
+      if (duplicateSweep && settled > 0) {
+        // The large SPAXX share count is the old balance from before the fund buy.
+        // Settled cash is the amount still sitting in SPAXX.
+        account.positions.forEach(function (p) {
+          if (!p.cashEquivalent) return;
+          p.units = roundMoney(settled);
+          p.price = 1;
+          p.value = roundMoney(settled);
+        });
+        sweepValue = roundMoney(settled);
       }
-      account.cash = roundMoney(account.cash);
-      if (duplicateSweep) account.positions = account.positions.filter(function (p) {
-        return !p.cashEquivalent;
-      });
-      var marked = account.positions.some(function (p) {
-        return p.marked;
-      });
-      if (duplicateSweep || marked) {
-        account.total = roundMoney(securityValue + account.cash);
-      } else if (reported != null && reported > 0) {
-        account.total = roundMoney(reported);
-      } else {
-        account.total = roundMoney(account.cash + securityValue);
-      }
+      account.cash = roundMoney(sweepValue > 0 ? sweepValue : settled);
+      account.total = roundMoney(securityValue + account.cash);
       delete account.buyingPower;
       try {
         var series = historyRows(
