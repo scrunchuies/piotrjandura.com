@@ -878,26 +878,41 @@ function snapConnectUrl(redirect, reconnectId) {
 }
 
 function positionRow(pos) {
+  var instrument = (pos && pos.instrument) || {};
   var sym = (pos && pos.symbol) || {};
   var inner = (sym && sym.symbol) || {};
-  var units = Number(pos.units != null ? pos.units : pos.fractional_units) || 0;
-  var price = Number(pos.price) || 0;
-  var cost = Number(pos.average_purchase_price);
-  var value = Math.round(units * price * 100) / 100;
+  var units = moneyAmount(pos.units != null ? pos.units : pos.fractional_units) || 0;
+  var price = moneyAmount(pos.price) || 0;
+  var costPer = moneyAmount(pos.cost_basis);
+  if (costPer == null) costPer = moneyAmount(pos.average_purchase_price);
+  var value = roundMoney(units * price);
+  var cost = costPer == null ? null : roundMoney(costPer * units);
   var pnl = pos.open_pnl != null && isFinite(Number(pos.open_pnl))
     ? Number(pos.open_pnl)
-    : isFinite(cost)
-      ? (price - cost) * units
-      : null;
+    : cost == null
+      ? null
+      : roundMoney(value - cost);
+  var symbol = String(
+    instrument.raw_symbol || instrument.symbol || inner.raw_symbol || inner.symbol || ""
+  ).toUpperCase();
+  var name = String(instrument.description || inner.description || sym.description || symbol);
   return {
-    symbol: String(inner.raw_symbol || inner.symbol || sym.description || "").toUpperCase(),
-    name: String(inner.description || sym.description || ""),
+    symbol: symbol,
+    name: name,
     units: units,
     price: price,
     value: value,
-    cost: isFinite(cost) ? Math.round(cost * units * 100) / 100 : null,
-    pnl: pnl == null ? null : Math.round(pnl * 100) / 100,
+    cost: cost,
+    pnl: pnl == null ? null : roundMoney(pnl),
+    cashEquivalent: Boolean(pos.cash_equivalent),
   };
+}
+
+function loadPositions(accountId) {
+  var all = snapRequest("get", "/accounts/" + accountId + "/positions/all", null);
+  if (all && Array.isArray(all.results)) return all.results;
+  if (Array.isArray(all)) return all;
+  return [];
 }
 
 function connectionRow(conn) {
@@ -1013,7 +1028,7 @@ function kickHoldingsRefresh(connections) {
   (connections || []).forEach(function (conn) {
     if (!conn || !conn.id || conn.disabled) return;
     try {
-      snapRequest("get", "/authorizations/" + conn.id + "/refresh", null);
+      snapRequest("post", "/authorizations/" + conn.id + "/refresh", null);
       asked = true;
     } catch (err) {
       error = String(err.message || err);
@@ -1101,12 +1116,12 @@ function fetchBrokerageLive() {
         out.warnings.push("Cash unavailable: " + String(err.message || err));
       }
       try {
-        var positions = snapRequest("get", "/accounts/" + acct.id + "/positions", null) || [];
+        var positions = loadPositions(acct.id);
         account.positions = positions.map(positionRow).filter(function (p) {
           return p.units !== 0;
         });
       } catch (err) {
-        out.warnings.push("Positions unavailable: " + String(err.message || err));
+        out.warnings.push("Holdings are not available yet: " + String(err.message || err));
       }
       var summed =
         account.cash +
